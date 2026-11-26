@@ -1,0 +1,31 @@
+name: evals
+on:
+  pull_request:
+    paths: ["src/**", "app/**", "prompts/**", "evals/**", "pyproject.toml"]
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run python -m evals.run --suite smoke
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      - run: uv run pytest -q tests/redteam
+  full:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run python -m evals.run --suite full
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}

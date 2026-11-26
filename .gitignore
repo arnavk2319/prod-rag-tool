@@ -1,0 +1,44 @@
+# --- local-only: planning, docs, agent tooling (not needed for CI, install or README)
+docs/
+logs/
+agentic-kit/
+agentic_kit/
+evals/
+scripts/
+worktrees/
+tests/
+CLAUDE.md
+.claude/
+test-results/
+
+# --- secrets and env
+.env
+.env.*
+!.env.example
+
+# --- python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# --- node / web
+node_modules/
+web/dist/
+
+# --- editors and OS
+.DS_Store
+.idea/
+.vscode/
+
+# --- local data and artifacts
+mlruns/
+mlartifacts/
+*.log

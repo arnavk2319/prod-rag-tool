@@ -1,0 +1,27 @@
+name: no-ai-attribution
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Scan commits, PR title and PR body
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pat='co-authored-by:.*(claude|anthropic|copilot|gpt|openai|gemini|cursor|codex|\bai\b|\bbot\b|noreply@anthropic)|generated (with|by) .*(claude|anthropic|copilot|\bai\b)|🤖'
+          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BODY" | grep -Eiq "$pat"; then
+            echo "PR title/body contains AI attribution. Remove it." >&2; exit 1
+          fi
+          if git log --format='%B' "$BASE..$HEAD" | grep -Eiq "$pat"; then
+            echo "A commit message contains AI attribution. Reword it." >&2; exit 1
+          fi
