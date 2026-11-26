@@ -1,15 +1,42 @@
 name: ci
+
 on:
   pull_request:
   push:
-    branches: [dev]
+    branches: [dev, main] # catches semantic conflicts between PRs that were each green on their own
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
+
+env:
+  CI: "true"
+  UV_FROZEN: "1" # fail if uv.lock is out of date
+
 jobs:
+  # Required check: verify. Steps skip themselves until the project scaffold (pyproject.toml) exists.
+  # Later tickets split this into lint-types, tests (pgvector + redis services), security-tests and boot-smoke.
   verify:
+    name: verify (ruff, pytest)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
-      - run: uv sync --frozen
-      - run: uv run ruff check . && uv run pytest -q
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+      - name: Install
+        if: ${{ hashFiles('pyproject.toml') != '' }}
+        run: uv sync
+      - name: Lint
+        if: ${{ hashFiles('pyproject.toml') != '' }}
+        run: uv run ruff check .
+      - name: Tests
+        if: ${{ hashFiles('pyproject.toml') != '' }}
+        run: uv run pytest -q
+      - name: Nothing to verify yet
+        if: ${{ hashFiles('pyproject.toml') == '' }}
+        run: echo "No pyproject.toml yet; nothing to verify."

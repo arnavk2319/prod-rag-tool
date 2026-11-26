@@ -1,0 +1,8 @@
+# Guarded paths: a change here needs the owner's review (needs branch protection "require review from
+# Code Owners"; note a solo owner cannot approve their own PR, so use admin bypass or leave that rule off).
+/.github/                   @arnavk2319
+/migrations/                @arnavk2319
+/evals/golden/              @arnavk2319
+/evals/thresholds.json      @arnavk2319
+/prompts/                   @arnavk2319
+/config/                    @arnavk2319

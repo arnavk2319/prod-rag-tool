@@ -1,31 +1,55 @@
 name: evals
+
+# PR eval gate, first cut. Uses the deterministic fake provider and no secrets (spec: "PR eval gate").
+# The recompute-and-compare-with-dev step and the policy check arrive with the P1 eval ticket.
+# The full suite (real Ollama models) runs locally, not here: Actions runners cannot host the models.
 on:
   pull_request:
-    paths: ["src/**", "app/**", "prompts/**", "evals/**", "pyproject.toml"]
-  schedule:
-    - cron: "0 6 * * *"
   workflow_dispatch:
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
+
+env:
+  UV_FROZEN: "1"
+  PROVIDER: fake
+
 jobs:
-  smoke:
-    if: github.event_name != 'schedule'
+  # Required check: eval-gate. Steps skip themselves until the code exists.
+  eval-gate:
+    name: eval-gate (smoke, red-team)
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
-      - run: uv sync --frozen
-      - run: uv run python -m evals.run --suite smoke
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
         env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      - run: uv run pytest -q tests/redteam
-  full:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust # throwaway CI database, no password to leak
+          POSTGRES_DB: rag_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d rag_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres@localhost:5432/rag_test
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
-      - run: uv sync --frozen
-      - run: uv run python -m evals.run --suite full
-        env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+      - name: Install
+        if: ${{ hashFiles('pyproject.toml') != '' }}
+        run: uv sync
+      - name: Smoke eval
+        if: ${{ hashFiles('evals/run.py') != '' }}
+        run: uv run python -m evals.run --suite smoke
+      - name: Red-team tests
+        if: ${{ hashFiles('tests/redteam/**/*.py') != '' }}
+        run: uv run pytest -q tests/redteam
+      - name: Nothing to evaluate yet
+        if: ${{ hashFiles('evals/run.py') == '' }}
+        run: echo "No eval runner yet; nothing to evaluate."
