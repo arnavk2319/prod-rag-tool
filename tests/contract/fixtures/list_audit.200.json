@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "action": "flag.update",
+      "actor": "usr_01",
+      "at": "2026-01-15T10:00:00Z",
+      "hash": "ab12cd34",
+      "seq": 41,
+      "target": "evidence_only_mode"
+    }
+  ],
+  "next_cursor": null
+}

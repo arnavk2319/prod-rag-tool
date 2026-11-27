@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "validation_failed",
+    "message": "invalid request",
+    "request_id": "req-0001-abcdef"
+  }
+}

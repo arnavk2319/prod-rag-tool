@@ -1,0 +1,10 @@
+{
+  "services": [
+    {
+      "detail": null,
+      "link": null,
+      "name": "postgres",
+      "status": "ok"
+    }
+  ]
+}

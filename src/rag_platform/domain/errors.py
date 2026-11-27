@@ -1,13 +1,21 @@
-"""Typed application errors; each maps to one HTTP status and one stable code."""
+"""Typed application errors; each maps to one HTTP status and one stable contract code."""
 
 
 class AppError(Exception):
     status_code = 500
     code = "internal_error"
 
-    def __init__(self, message: str = "") -> None:
+    def __init__(
+        self,
+        message: str = "",
+        *,
+        retry_after: int | None = None,
+        details: dict[str, object] | None = None,
+    ) -> None:
         super().__init__(message or self.code)
         self.message = message or self.code
+        self.retry_after = retry_after  # seconds; emitted as Retry-After on 429
+        self.details = details
 
 
 class ValidationFailed(AppError):
@@ -47,12 +55,12 @@ class RateLimited(AppError):
 
 class UpstreamUnavailable(AppError):
     status_code = 503
-    code = "upstream_unavailable"
+    code = "dependency_unavailable"
 
 
 class UpstreamTimeout(AppError):
     status_code = 504
-    code = "upstream_timeout"
+    code = "dependency_unavailable"
 
 
 class Internal(AppError):

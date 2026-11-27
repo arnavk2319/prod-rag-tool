@@ -1,0 +1,15 @@
+{
+  "enabled_chain": [
+    "local-small"
+  ],
+  "env": "local",
+  "honesty_text": "Local models and simulated providers.",
+  "provider_mode": "simulated",
+  "service_links": [
+    {
+      "name": "grafana",
+      "url": "http://localhost:3000"
+    }
+  ],
+  "version": "1.0.0"
+}

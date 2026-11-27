@@ -1,0 +1,8 @@
+{
+  "pointers": [
+    {
+      "name": "active_index",
+      "ref": "idx_3"
+    }
+  ]
+}

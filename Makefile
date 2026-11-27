@@ -1,4 +1,4 @@
-.PHONY: lint test typecheck verify up up-obs up-llm down clean urls doctor
+.PHONY: lint test typecheck verify contract-update up up-obs up-llm down clean urls doctor
 
 lint:
 	uv run ruff check . && uv run ruff format --check .
@@ -11,6 +11,9 @@ test:
 
 verify:
 	uv run ruff check . && uv run pytest -q
+
+contract-update:
+	uv run python scripts/contract_update.py
 
 # --- local stack (Compose v2). Reads .env if present; ports and BIND_ADDR come from env.
 up:

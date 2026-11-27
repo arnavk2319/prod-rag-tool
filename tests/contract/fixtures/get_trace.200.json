@@ -1,0 +1,36 @@
+{
+  "at": "2026-01-15T10:00:00Z",
+  "attempts": [
+    {
+      "latency_ms": 2010,
+      "model": "local-small",
+      "outcome": "ok",
+      "tokens_in": 812,
+      "tokens_out": 64
+    }
+  ],
+  "cache": "miss",
+  "fallback_reasons": [],
+  "latency_ms": 2140,
+  "message_id": "msg_01",
+  "outcome": "answered",
+  "retrieved": [
+    {
+      "chunk_id": "chunk_07",
+      "document_id": "doc_01",
+      "score": 0.82
+    }
+  ],
+  "served_model": "local-small",
+  "stage_latency": [
+    {
+      "latency_ms": 90,
+      "stage": "retrieve"
+    },
+    {
+      "latency_ms": 2010,
+      "stage": "generate"
+    }
+  ],
+  "trace_id": "9f2c1d7a3b4e4f10"
+}
