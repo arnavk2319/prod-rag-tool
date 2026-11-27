@@ -1,11 +1,6 @@
-# --- local-only: planning, docs, agent tooling (not needed for CI, install or README)
-docs/
+# --- local-only runtime folders (private planning files are hidden via .git/info/exclude, see scripts/agentic/private-mode.ts)
 logs/
-agentic-kit/
-agentic_kit/
 worktrees/
-CLAUDE.md
-.claude/
 test-results/
 
 # --- secrets and env

@@ -46,6 +46,16 @@ export interface Check {
 
 export const root = (): string => process.env.KIT_ROOT ?? process.cwd();
 
+/** Folder holding spec, status, backlog and tickets: kit.json `private_dir` (private mode), else `docs`. */
+export function planningDir(dir = root()): string {
+  try {
+    const k = JSON.parse(readFileSync(join(dir, ".claude", "kit.json"), "utf8")) as { private_dir?: string };
+    return k.private_dir || "docs";
+  } catch {
+    return "docs";
+  }
+}
+
 export function loadBudgets(dir = root()): Budgets {
   return JSON.parse(readFileSync(join(dir, ".claude", "budgets.json"), "utf8")) as Budgets;
 }
@@ -137,9 +147,9 @@ export function spendForTicket(es: UsageEntry[], ticket: string): number {
   return sum(es.filter((e) => e.ticket === ticket));
 }
 
-/** Read `size:` from docs/tickets/<ticket>.md; default M when absent. */
+/** Read `size:` from <planning dir>/tickets/<ticket>.md; default M when absent. */
 export function ticketSize(ticket: string, dir = root()): Size {
-  const f = join(dir, "docs", "tickets", `${ticket}.md`);
+  const f = join(dir, planningDir(dir), "tickets", `${ticket}.md`);
   if (!existsSync(f)) return "M";
   const m = /^size:\s*([SML])\b/m.exec(readFileSync(f, "utf8"));
   return (m?.[1] as Size | undefined) ?? "M";
