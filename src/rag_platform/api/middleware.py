@@ -22,6 +22,7 @@ class TraceMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         incoming = request.headers.get(TRACE_HEADER, "")
         trace_id = incoming if _VALID.match(incoming) else uuid.uuid4().hex
+        request.state.trace_id = trace_id
         structlog.contextvars.clear_contextvars()
         structlog.contextvars.bind_contextvars(trace_id=trace_id)
         start = time.perf_counter()
