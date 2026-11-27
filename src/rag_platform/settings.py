@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     models_file: str = "config/models.yaml"
     ollama_base_url: str = "http://ollama:11434/v1"
     user_daily_token_cap: int = Field(default=200_000, ge=0)
-    embedding_backend: Literal["fake", "fastembed"] = "fake"
+    embedding_backend: Literal["hash", "fastembed"] = "hash"
     jwt_signing_key: str = "change-me-dev-only"
     cache_ttl_s: int = Field(default=300, ge=0)
     rate_limit_user_rpm: int = Field(default=30, ge=1)

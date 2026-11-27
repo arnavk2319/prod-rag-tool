@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from evals.lib import REPO_ROOT, inputs_hash, wilson_interval, write_report
+from evals.metrics_chunking import chunk_determinism
 from evals.providers import SERVED_MODEL, ExtractiveFakeProvider, overlap, render_prompt
 from rag_platform.domain.ports import ModelProvider
 
@@ -123,6 +124,7 @@ def build_report(
     }
     if inj:
         metrics["injection_block_rate"] = inj["rate"]
+    metrics["chunk_determinism"] = chunk_determinism(root)
     suite_text = (root / "evals" / "suites" / f"{suite}.jsonl").read_bytes()
     return {
         "header": HEADER,
