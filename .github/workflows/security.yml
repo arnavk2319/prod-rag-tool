@@ -1,23 +1,97 @@
 name: security
+
 on:
   pull_request:
+  push:
+    branches: [dev, main]
   schedule:
-    - cron: "0 5 * * 1"
+    - cron: "17 6 * * 1" # weekly, catches newly published advisories
+  workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
+
 jobs:
+  # Required check: secrets. Scans the whole history for committed credentials.
   secrets:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { fetch-depth: 0, persist-credentials: false }
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  audit:
+
+  # Required check: sast. Static analysis for injection, unsafe deserialization, SSRF, XSS and similar.
+  sast:
+    name: sast (semgrep)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
-      - run: uv sync --frozen
-      - run: uvx pip-audit
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: { python-version: "3.12" }
+      - run: pip install "semgrep==1.*"
+      - run: >-
+          semgrep scan --error --quiet
+          --config p/default --config p/python --config p/typescript
+          --config p/secrets --config p/owasp-top-ten
+          --include '*.py' --include '*.ts' --include '*.tsx'
+          .
+
+  # Required check: dependency-audit. Known vulnerabilities in locked dependencies.
+  # Steps skip themselves until the lockfiles exist, so the check passes on an empty scaffold.
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+      - name: pip-audit (locked Python dependencies)
+        if: ${{ hashFiles('uv.lock') != '' }}
+        run: |
+          uv export --frozen --no-hashes --no-emit-project -o /tmp/requirements-audit.txt
+          uvx pip-audit --no-deps --disable-pip -r /tmp/requirements-audit.txt
+      - name: npm audit (web)
+        if: ${{ hashFiles('web/package-lock.json') != '' }}
+        working-directory: web
+        run: npm audit --audit-level=high
+      - name: Nothing to audit yet
+        if: ${{ hashFiles('uv.lock') == '' && hashFiles('web/package-lock.json') == '' }}
+        run: echo "No lockfiles yet; nothing to audit."
+
+  # Pull requests only: block newly introduced vulnerable dependencies.
+  # Needs "Dependency graph" enabled in the repo settings; advisory until then.
+  dependency-review:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
+  # Required check: workflow-security. Lints these workflows for injection and over-broad permissions.
+  workflow-security:
+    name: workflow-security (zizmor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with: { persist-credentials: false }
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+      - run: uvx zizmor --min-severity medium .github
