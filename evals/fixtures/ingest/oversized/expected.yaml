@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "file": "oversized.txt",
+      "outcome": "rejected",
+      "reason": "file_too_large"
+    }
+  ],
+  "generate_at_test_time": {
+    "filler": "A",
+    "size_bytes": 10485761
+  },
+  "kind": "oversized",
+  "max_upload_bytes": 10485760,
+  "tenant": "bank-a"
+}

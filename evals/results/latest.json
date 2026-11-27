@@ -42,7 +42,7 @@
     "cross_tenant_leakage": 0
   },
   "header": "mechanism proof, not model quality (provider: fake-extractive)",
-  "inputs_hash": "e35402b72e517baa115ffd9d19785dfd72e8412e416ca4a1c32dffa2474ae1d5",
+  "inputs_hash": "5dbfc7a7e25706927870085e10719e67842630eac23e529e19263bc867c5d9c1",
   "metrics": {
     "injection_block_rate": 1.0,
     "mrr": 1.0,

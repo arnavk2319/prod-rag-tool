@@ -1,0 +1,17 @@
+{
+  "files": [
+    {
+      "file": "copy.md",
+      "outcome": "accepted",
+      "reason": null
+    },
+    {
+      "file": "original.md",
+      "outcome": "rejected",
+      "reason": "duplicate_hash"
+    }
+  ],
+  "kind": "duplicate",
+  "note": "same (tenant, doc_hash) ingested twice; the second is a no-op rejection (UNIQUE tenant_id, doc_hash); order: copy.md first",
+  "tenant": "bank-a"
+}

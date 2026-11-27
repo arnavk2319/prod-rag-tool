@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "file": "clean.md",
+      "outcome": "accepted",
+      "reason": null
+    }
+  ],
+  "kind": "clean",
+  "tenant": "bank-a"
+}

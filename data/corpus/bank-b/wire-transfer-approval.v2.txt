@@ -1,0 +1,13 @@
+WIRE TRANSFER APPROVAL STANDARD
+
+PURPOSE
+This is synthetic policy POL-2309 of Birch Test Credit Union. It exists only for software testing.
+
+POLICY
+Outgoing wires above 20000 dollars require dual approval. This is version 2 of the standard.
+
+EXCEPTIONS
+Exceptions require written approval from the policy owner, Jules Madeupton.
+
+REVIEW
+Birch Test Credit Union reviews this policy every 12 months.
