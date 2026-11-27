@@ -39,15 +39,29 @@
     }
   },
   "hard_zero": {
-    "cross_tenant_leakage": 0
+    "cross_tenant_leakage": 0,
+    "pii_leak": 0
   },
   "header": "mechanism proof, not model quality (provider: fake-extractive)",
-  "inputs_hash": "cb7284a31cd67cc1045502cc09bc0ac36ee00d6e8d4a1f7c967de2d3c73c54c9",
+  "inputs_hash": "4a8ba14106a55cf06e450d74c9e6ab53cfc8e93a8ed6de58a6cf98ef12ff5834",
   "metrics": {
     "chunk_determinism": 1.0,
     "injection_block_rate": 1.0,
     "mrr": 1.0,
+    "pii_recall": 1.0,
     "recall_at_5": 1.0
+  },
+  "pii": {
+    "leaked": 0,
+    "n_in_scope": 85,
+    "n_out_of_scope": 15,
+    "note": "recall is over structured seed kinds only (85 of 100); names out of scope",
+    "out_of_scope_kinds": [
+      "name"
+    ],
+    "recall_wilson95_high": 1.0,
+    "recall_wilson95_low": 0.956759,
+    "redacted": 85
   },
   "served_model": "fake-extractive",
   "suite": "smoke",
