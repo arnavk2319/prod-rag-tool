@@ -1,0 +1,220 @@
+# Local dev stack. Core = api, worker, postgres(+pgvector), redis, mlflow. Profiles: llm, obs.
+# Ports come from env and bind to BIND_ADDR (default 127.0.0.1). Image tags are pinned.
+name: ragplatform
+
+x-app: &app
+  image: rag-platform:dev
+  pull_policy: never
+  restart: unless-stopped
+  networks: [ragnet]
+  environment: &app-env
+    APP_ENV: ${APP_ENV:-local}
+    PROVIDER: ${PROVIDER:-fake}
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    # app login is rag_svc, a member of rag_app (not the table owner, RLS applies)
+    DATABASE_URL: postgresql+psycopg://rag_svc:${RAG_SVC_PASSWORD:-dev-only-svc-password}@postgres:5432/ragapp
+    REDIS_URL: redis://redis:6379/0
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+    MODELS_FILE: /app/config/models.yaml
+    OLLAMA_BASE_URL: http://ollama:11434/v1
+    JWT_SIGNING_KEY: ${JWT_SIGNING_KEY:-change-me-dev-only}
+    PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:${API_PORT:-8000}}
+    ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+  volumes:
+    - ./config:/app/config:ro
+    - ./prompts:/app/prompts:ro
+
+services:
+  api:
+    <<: *app
+    # api is the only service that builds the shared image; worker and mlflow reuse it
+    build: .
+    command: ["uvicorn", "rag_platform.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${API_PORT:-8000}:8000"
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 15s
+    mem_limit: 512m
+
+  # PLACEHOLDER: no worker entrypoint exists yet (src/rag_platform/worker is empty). It idles so the
+  # service and its healthcheck are wired; replace `command` when the ingest worker lands.
+  worker:
+    <<: *app
+    command: ["python", "-c", "import time; print('worker placeholder: idle'); time.sleep(10**9)"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import rag_platform"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    mem_limit: 512m
+
+  postgres:
+    image: pgvector/pgvector:0.8.0-pg16
+    restart: unless-stopped
+    networks: [ragnet]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-only-postgres-password}
+      RAG_OWNER_PASSWORD: ${RAG_OWNER_PASSWORD:-dev-only-owner-password}
+      RAG_SVC_PASSWORD: ${RAG_SVC_PASSWORD:-dev-only-svc-password}
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sh:/docker-entrypoint-initdb.d/10-init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ragapp"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    mem_limit: 768m
+
+  redis:
+    image: redis:7.4.2-alpine
+    restart: unless-stopped
+    networks: [ragnet]
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    mem_limit: 192m
+
+  mlflow:
+    <<: *app
+    # RAG_OWNER_PASSWORD and RAG_SVC_PASSWORD must be URL-safe (they are embedded in database URLs).
+    # Same image as the api (mlflow is a pinned project dependency); api never depends on this service.
+    environment:
+      <<: *app-env
+      # job execution spawns ~8 huey consumers (~240 MiB each); the tracking server does not need it
+      MLFLOW_SERVER_ENABLE_JOB_EXECUTION: "false"
+      MLFLOW_SERVER_JOB_ENABLE_PERIODIC_TASKS: "false"
+    command:
+      - mlflow
+      - server
+      - --host=0.0.0.0
+      - --port=5000
+      # one worker: the default spawns several uvicorn workers and exceeds the 768m limit
+      - --workers=1
+      # RAG_OWNER_PASSWORD must be URL-safe (letters, digits, - . _ ~); or set MLFLOW_BACKEND_STORE_URI with an encoded password
+      - --backend-store-uri=${MLFLOW_BACKEND_STORE_URI:-postgresql+psycopg://rag_owner:${RAG_OWNER_PASSWORD:-dev-only-owner-password}@postgres:5432/mlflow}
+      - --allowed-hosts=*
+      - --serve-artifacts
+      - --artifacts-destination=/mlflow/artifacts
+    volumes:
+      - mlflow-artifacts:/mlflow/artifacts
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${MLFLOW_PORT:-5000}:5000"
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:5000/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    mem_limit: 768m
+
+  ollama:
+    profiles: [llm]
+    image: ollama/ollama:0.12.6
+    restart: unless-stopped
+    networks: [ragnet]
+    environment:
+      OLLAMA_MAX_LOADED_MODELS: "1"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-5m}
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    mem_limit: 5g
+
+  ollama-pull:
+    profiles: [llm]
+    image: ollama/ollama:0.12.6
+    networks: [ragnet]
+    restart: "no"
+    depends_on:
+      ollama: {condition: service_healthy}
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      MODELS_FILE: /app/config/models.yaml
+    entrypoint: ["/bin/sh", "/app/scripts/ollama-pull.sh"]
+    volumes:
+      - ./config:/app/config:ro
+      - ./scripts/ollama-pull.sh:/app/scripts/ollama-pull.sh:ro
+    mem_limit: 256m
+
+  prometheus:
+    profiles: [obs]
+    image: prom/prometheus:v3.5.0
+    restart: unless-stopped
+    networks: [ragnet]
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9090/-/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
+    mem_limit: 384m
+
+  grafana:
+    profiles: [obs]
+    image: grafana/grafana:12.2.0
+    restart: unless-stopped
+    networks: [ragnet]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-dev-only-grafana-password}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    depends_on:
+      prometheus: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 15s
+    mem_limit: 384m
+
+networks:
+  ragnet:
+
+volumes:
+  pgdata:
+  mlflow-artifacts:
+  ollama-models:
+  promdata:
+  grafanadata:
