@@ -1,6 +1,6 @@
 # P1 memory measurement
 
-Status: NOT YET MEASURED. The table below holds no results; nothing here is an estimate presented as fact.
+Status: measured once on the machine below. Idle readings only (no load, no model request except where stated); Ollama measured with no model loaded because `config/models.yaml` does not exist yet, so `make up-llm` model pulls and the two-model `ollama ps` check are still pending.
 
 ## Procedure
 
@@ -17,23 +17,31 @@ Status: NOT YET MEASURED. The table below holds no results; nothing here is an e
 
 | Item | Value |
 | --- | --- |
-| Hardware | NOT YET MEASURED |
-| Docker runtime / VM memory | NOT YET MEASURED |
-| Date | NOT YET MEASURED |
-| Git SHA | NOT YET MEASURED |
+| Hardware | MacBook Pro (Mac14,9), Apple M2 Pro, 16 GB RAM |
+| Docker runtime / VM memory | Docker 28.5.1, VM limit 7.65 GiB |
+| Date | 2026-11-27 |
+| Git SHA | branch t-004-docker-compose (see PR) |
 
 ## Results
 
-| Profile | Service | Peak/idle MiB | Configured mem_limit | Spec estimate | Verdict |
-| --- | --- | --- | --- | --- | --- |
-| core | api | NOT YET MEASURED | 512m | NOT YET MEASURED | - |
-| core | worker (placeholder) | NOT YET MEASURED | 512m | NOT YET MEASURED | - |
-| core | postgres | NOT YET MEASURED | 768m | NOT YET MEASURED | - |
-| core | redis | NOT YET MEASURED | 192m | NOT YET MEASURED | - |
-| core | mlflow | NOT YET MEASURED | 768m | NOT YET MEASURED | - |
-| obs | prometheus | NOT YET MEASURED | 384m | NOT YET MEASURED | - |
-| obs | grafana | NOT YET MEASURED | 384m | NOT YET MEASURED | - |
-| llm | ollama (1 model loaded) | NOT YET MEASURED | 5g | NOT YET MEASURED | - |
-| llm | `OLLAMA_MAX_LOADED_MODELS=1` check | NOT YET MEASURED | - | - | - |
+Core and obs readings were taken about 60 s after `--wait` reported healthy. `make up-obs` (core + obs, built from scratch) became healthy in about 70 s after images were pulled.
 
-The mem_limit values are starting caps chosen before any measurement; they may be corrected by the results.
+| Profile | Service | Idle MiB | Configured mem_limit | Verdict |
+| --- | --- | --- | --- | --- |
+| core | api | 40 | 512m | cap generous; revisit once the real pipeline loads models |
+| core | worker (placeholder) | 5 | 512m | placeholder only |
+| core | postgres | 79 | 768m | fine at idle |
+| core | redis | 9 | 192m | fine |
+| core | mlflow | 82-371 (settles near 370 after start) | 768m | fine only with job execution disabled, see below |
+| obs | prometheus | 26 | 384m | fine |
+| obs | grafana | 133 | 384m | fine |
+| llm | ollama (no model loaded) | 42 | 5g | model memory not yet measured |
+| llm | `OLLAMA_MAX_LOADED_MODELS=1` | confirmed present in the container env (`OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_NUM_PARALLEL=1`) | - | the two-model `ollama ps` check is pending |
+
+Core plus obs idle total is about 0.7 GB, well under the 8.5 GB of configured limits; the spec's "about 8.5 GB" figure counts limits, not use, and stays an upper bound until models are loaded.
+
+## Findings from the first real run
+
+- MLflow 3.x starts a background job runner (about eight huey consumers at about 240 MiB each) that pushed the container past 1.5 GiB and into OOM restarts. The tracking server does not need it, so `MLFLOW_SERVER_ENABLE_JOB_EXECUTION=false` and `MLFLOW_SERVER_JOB_ENABLE_PERIODIC_TASKS=false` are set, which brought it to about 370 MiB.
+- Three services built the same image tag in parallel and failed with "image already exists"; only `api` builds now.
+- On macOS, port 5000 is taken by AirPlay Receiver and 11434 by a native Ollama if one is installed. `make doctor` reports both by variable name; set `MLFLOW_PORT` and `OLLAMA_PORT` in `.env`.

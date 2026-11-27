@@ -248,3 +248,19 @@ def test_compose_mounts_exist() -> None:
         if path.name == "config":
             continue  # covered by test_models_file_exists
         assert path.exists(), m.group(1)
+
+
+def test_only_one_service_builds_the_shared_image(full: dict[str, Any]) -> None:
+    """Regression (first real run): parallel builds of one tag fail with 'image already exists'."""
+    builders = [n for n, s in full["services"].items() if "build" in s]
+    assert builders == ["api"]
+    for name in ("worker", "mlflow"):
+        assert full["services"][name]["image"] == full["services"]["api"]["image"]
+
+
+def test_mlflow_job_execution_disabled(full: dict[str, Any]) -> None:
+    """Regression (first real run): MLflow job runner (~8 consumers) OOMs the 768m cap."""
+    env = full["services"]["mlflow"]["environment"]
+    assert env["MLFLOW_SERVER_ENABLE_JOB_EXECUTION"] == "false"
+    assert env["MLFLOW_SERVER_JOB_ENABLE_PERIODIC_TASKS"] == "false"
+    assert "--workers=1" in full["services"]["mlflow"]["command"]

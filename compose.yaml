@@ -3,8 +3,8 @@
 name: ragplatform
 
 x-app: &app
-  build: .
   image: rag-platform:dev
+  pull_policy: never
   restart: unless-stopped
   networks: [ragnet]
   environment: &app-env
@@ -27,6 +27,8 @@ x-app: &app
 services:
   api:
     <<: *app
+    # api is the only service that builds the shared image; worker and mlflow reuse it
+    build: .
     command: ["uvicorn", "rag_platform.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
     ports:
       - "${BIND_ADDR:-127.0.0.1}:${API_PORT:-8000}:8000"
@@ -95,11 +97,18 @@ services:
     <<: *app
     # RAG_OWNER_PASSWORD and RAG_SVC_PASSWORD must be URL-safe (they are embedded in database URLs).
     # Same image as the api (mlflow is a pinned project dependency); api never depends on this service.
+    environment:
+      <<: *app-env
+      # job execution spawns ~8 huey consumers (~240 MiB each); the tracking server does not need it
+      MLFLOW_SERVER_ENABLE_JOB_EXECUTION: "false"
+      MLFLOW_SERVER_JOB_ENABLE_PERIODIC_TASKS: "false"
     command:
       - mlflow
       - server
       - --host=0.0.0.0
       - --port=5000
+      # one worker: the default spawns several uvicorn workers and exceeds the 768m limit
+      - --workers=1
       # RAG_OWNER_PASSWORD must be URL-safe (letters, digits, - . _ ~); or set MLFLOW_BACKEND_STORE_URI with an encoded password
       - --backend-store-uri=${MLFLOW_BACKEND_STORE_URI:-postgresql+psycopg://rag_owner:${RAG_OWNER_PASSWORD:-dev-only-owner-password}@postgres:5432/mlflow}
       - --allowed-hosts=*
