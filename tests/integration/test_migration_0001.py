@@ -12,6 +12,7 @@ import psycopg
 import pytest
 from alembic import command
 from alembic.config import Config
+from pg_helpers import add_chunk
 
 pytestmark = pytest.mark.integration
 
@@ -66,17 +67,8 @@ def _tables(d: str) -> set[str]:
     return {r[0] for r in rows}
 
 
-def _vec(i: int) -> str:
-    return "[" + ",".join(["0.1"] * 383 + [str(i)]) + "]"
-
-
 def _add_chunk(c: psycopg.Connection, tenant: str, cid: str) -> None:
-    c.execute(
-        "INSERT INTO chunks (chunk_id,index_version,tenant_id,doc_id,ordinal,text,span_start,"
-        "span_end,acl_labels,effective_date,embedding_model,chunker_version,embedding) "
-        "VALUES (%s,'v1',%s,'d',0,'hello world',0,11,'{a}',current_date,'m','c1',%s::vector)",
-        (cid, tenant, _vec(1)),
-    )
+    add_chunk(c, tenant, cid)
 
 
 def test_upgrade_downgrade_upgrade(dsn: str) -> None:

@@ -12,6 +12,7 @@ import psycopg
 import pytest
 from alembic import command
 from alembic.config import Config
+from pg_helpers import add_chunk
 
 pytestmark = pytest.mark.integration
 
@@ -48,17 +49,8 @@ def dsn(monkeypatch: pytest.MonkeyPatch) -> Iterator[str]:
     _reset(d)
 
 
-def _vec() -> str:
-    return "[" + ",".join(["0.1"] * 384) + "]"
-
-
 def _chunk(c: psycopg.Connection, tenant: str, cid: str, version: str = "v1") -> None:
-    c.execute(
-        "INSERT INTO chunks (chunk_id,index_version,tenant_id,doc_id,ordinal,text,span_start,"
-        "span_end,acl_labels,effective_date,embedding_model,chunker_version,embedding) "
-        "VALUES (%s,%s,%s,'d',0,'hello world',0,11,'{a}',current_date,'m','c1',%s::vector)",
-        (cid, version, tenant, _vec()),
-    )
+    add_chunk(c, tenant, cid, version)
 
 
 def _doc(c: psycopg.Connection, tenant: str) -> None:

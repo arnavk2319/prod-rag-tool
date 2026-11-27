@@ -11,6 +11,7 @@ import pytest
 from rag_platform.services.ingest.chunker import (
     MAX_TOKENS,
     MIN_TOKENS,
+    TARGET_TOKENS,
     chunk_id,
     chunk_text,
     count_tokens,
@@ -80,10 +81,10 @@ def test_long_paragraph_without_sentence_ends() -> None:
     text = words(5000)
     cs = chunk_text(DH, text)
     check_invariants(text, cs)
-    assert all(c.tokens == 400 for c in cs[:-1])
+    assert all(c.tokens == TARGET_TOKENS for c in cs[:-1])
 
 
-@pytest.mark.parametrize("n", [299, 300, 499, 500, 501, 520, 700, 1000])
+@pytest.mark.parametrize("n", [199, 200, 349, 350, 351, 370, 500, 700, 1000])
 def test_boundary_sizes(n: int) -> None:
     text = prose(n)
     check_invariants(text, chunk_text(DH, text))
@@ -92,7 +93,7 @@ def test_boundary_sizes(n: int) -> None:
 def test_overlap_ratio_about_12_percent() -> None:
     text = words(3000)
     for c in chunk_text(DH, text)[1:]:
-        assert c.overlap_tokens == 48  # round(0.12 * 400)
+        assert c.overlap_tokens == 36  # round(0.12 * 300)
 
 
 def test_nested_headings_path() -> None:

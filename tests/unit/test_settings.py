@@ -21,7 +21,7 @@ def test_defaults() -> None:
     assert s.cache_ttl_s == 300
     assert s.rate_limit_user_rpm == 30
     assert s.rate_limit_tenant_rpm == 300
-    assert s.context_token_budget == 3000
+    assert s.context_token_budget == 4000
     assert s.log_level == "INFO"
 
 

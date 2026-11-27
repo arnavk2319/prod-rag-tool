@@ -12,6 +12,7 @@ from rag_platform.domain.ports import (
     AuditEvent,
     Chunk,
     Completion,
+    ParentChunk,
     ScoredChunk,
 )
 
@@ -73,11 +74,24 @@ class FakeReranker:
 class FakeIndexRepository:
     def __init__(self) -> None:
         self._chunks: dict[str, Chunk] = {}
+        self._parents: dict[tuple[str, str, str], ParentChunk] = {}
 
     async def add_chunks(self, chunks: Sequence[Chunk]) -> int:
         for c in chunks:
             self._chunks[c.chunk_id] = c  # idempotent on chunk id
         return len(chunks)
+
+    async def add_parents(self, parents: Sequence[ParentChunk]) -> int:
+        for p in parents:
+            self._parents[(p.index_version, p.tenant_id, p.parent_id)] = p  # idempotent
+        return len(parents)
+
+    async def get_parents(
+        self, *, tenant_id: str, index_version: str, parent_ids: Sequence[str]
+    ) -> dict[str, ParentChunk]:
+        """Keyed like the SQL table (index_version, tenant_id, parent_id): no cross-tenant hit."""
+        found = {pid: self._parents.get((index_version, tenant_id, pid)) for pid in parent_ids}
+        return {pid: p for pid, p in found.items() if p is not None}
 
     async def search(
         self,
@@ -105,6 +119,10 @@ class FakeIndexRepository:
         ]
         for i in ids:
             del self._chunks[i]
+        for key in [
+            k for k, p in self._parents.items() if k[1] == tenant_id and p.doc_id == doc_id
+        ]:
+            del self._parents[key]
         return len(ids)
 
 
