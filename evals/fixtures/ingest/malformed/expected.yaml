@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "file": "truncated.pdf",
+      "outcome": "rejected",
+      "reason": "parse_error"
+    }
+  ],
+  "kind": "malformed",
+  "tenant": "bank-a"
+}

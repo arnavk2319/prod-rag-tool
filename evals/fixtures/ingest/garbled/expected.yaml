@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "file": "garbled.txt",
+      "outcome": "quarantined",
+      "reason": "garbled_text"
+    }
+  ],
+  "kind": "garbled",
+  "tenant": "bank-a"
+}

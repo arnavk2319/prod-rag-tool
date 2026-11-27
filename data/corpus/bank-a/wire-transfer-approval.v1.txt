@@ -1,0 +1,13 @@
+WIRE TRANSFER APPROVAL STANDARD
+
+PURPOSE
+This is synthetic policy POL-3350 of Alder Test Bank. It exists only for software testing.
+
+POLICY
+Outgoing wires above 7500 dollars require dual approval. This is version 1 of the standard.
+
+EXCEPTIONS
+Exceptions require written approval from the policy owner, Harper Fauxley.
+
+REVIEW
+Alder Test Bank reviews this policy every 12 months.

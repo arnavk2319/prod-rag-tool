@@ -1,0 +1,13 @@
+MORTGAGE UNDERWRITING GUIDE
+
+PURPOSE
+This is synthetic policy POL-4844 of Alder Test Bank. It exists only for software testing.
+
+POLICY
+The maximum loan-to-value ratio is 75 percent for owner-occupied homes. This is version 1 of the standard.
+
+EXCEPTIONS
+Exceptions require written approval from the policy owner, Parker Notreal.
+
+REVIEW
+Alder Test Bank reviews this policy every 12 months.

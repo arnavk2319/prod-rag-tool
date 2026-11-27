@@ -1,0 +1,505 @@
+{
+  "items": [
+    {
+      "id": "pii-001",
+      "kind": "email",
+      "value": "alex.mockridge0@example.test"
+    },
+    {
+      "id": "pii-002",
+      "kind": "email",
+      "value": "blair.stubbstest1@example.test"
+    },
+    {
+      "id": "pii-003",
+      "kind": "email",
+      "value": "casey.fakeman2@example.test"
+    },
+    {
+      "id": "pii-004",
+      "kind": "email",
+      "value": "drew.fictionby3@example.test"
+    },
+    {
+      "id": "pii-005",
+      "kind": "email",
+      "value": "emery.examplesworth4@example.test"
+    },
+    {
+      "id": "pii-006",
+      "kind": "email",
+      "value": "finley.notreal5@example.test"
+    },
+    {
+      "id": "pii-007",
+      "kind": "email",
+      "value": "harper.testwood6@example.test"
+    },
+    {
+      "id": "pii-008",
+      "kind": "email",
+      "value": "jules.syntheton7@example.test"
+    },
+    {
+      "id": "pii-009",
+      "kind": "email",
+      "value": "kendall.madeupton8@example.test"
+    },
+    {
+      "id": "pii-010",
+      "kind": "email",
+      "value": "logan.dummyfield9@example.test"
+    },
+    {
+      "id": "pii-011",
+      "kind": "email",
+      "value": "morgan.imaginar10@example.test"
+    },
+    {
+      "id": "pii-012",
+      "kind": "email",
+      "value": "nico.placeholder11@example.test"
+    },
+    {
+      "id": "pii-013",
+      "kind": "email",
+      "value": "parker.pretendell12@example.test"
+    },
+    {
+      "id": "pii-014",
+      "kind": "email",
+      "value": "quinn.samplestein13@example.test"
+    },
+    {
+      "id": "pii-015",
+      "kind": "email",
+      "value": "reese.fauxley14@example.test"
+    },
+    {
+      "id": "pii-016",
+      "kind": "email",
+      "value": "alex.mockridge15@example.test"
+    },
+    {
+      "id": "pii-017",
+      "kind": "email",
+      "value": "blair.stubbstest16@example.test"
+    },
+    {
+      "id": "pii-018",
+      "kind": "email",
+      "value": "casey.fakeman17@example.test"
+    },
+    {
+      "id": "pii-019",
+      "kind": "email",
+      "value": "drew.fictionby18@example.test"
+    },
+    {
+      "id": "pii-020",
+      "kind": "email",
+      "value": "emery.examplesworth19@example.test"
+    },
+    {
+      "id": "pii-021",
+      "kind": "phone",
+      "value": "212-555-0100"
+    },
+    {
+      "id": "pii-022",
+      "kind": "phone",
+      "value": "416-555-0105"
+    },
+    {
+      "id": "pii-023",
+      "kind": "phone",
+      "value": "212-555-0110"
+    },
+    {
+      "id": "pii-024",
+      "kind": "phone",
+      "value": "416-555-0115"
+    },
+    {
+      "id": "pii-025",
+      "kind": "phone",
+      "value": "212-555-0120"
+    },
+    {
+      "id": "pii-026",
+      "kind": "phone",
+      "value": "416-555-0125"
+    },
+    {
+      "id": "pii-027",
+      "kind": "phone",
+      "value": "212-555-0130"
+    },
+    {
+      "id": "pii-028",
+      "kind": "phone",
+      "value": "416-555-0135"
+    },
+    {
+      "id": "pii-029",
+      "kind": "phone",
+      "value": "212-555-0140"
+    },
+    {
+      "id": "pii-030",
+      "kind": "phone",
+      "value": "416-555-0145"
+    },
+    {
+      "id": "pii-031",
+      "kind": "phone",
+      "value": "212-555-0150"
+    },
+    {
+      "id": "pii-032",
+      "kind": "phone",
+      "value": "416-555-0155"
+    },
+    {
+      "id": "pii-033",
+      "kind": "phone",
+      "value": "212-555-0160"
+    },
+    {
+      "id": "pii-034",
+      "kind": "phone",
+      "value": "416-555-0165"
+    },
+    {
+      "id": "pii-035",
+      "kind": "phone",
+      "value": "212-555-0170"
+    },
+    {
+      "id": "pii-036",
+      "kind": "phone",
+      "value": "416-555-0175"
+    },
+    {
+      "id": "pii-037",
+      "kind": "phone",
+      "value": "212-555-0180"
+    },
+    {
+      "id": "pii-038",
+      "kind": "phone",
+      "value": "416-555-0185"
+    },
+    {
+      "id": "pii-039",
+      "kind": "phone",
+      "value": "212-555-0190"
+    },
+    {
+      "id": "pii-040",
+      "kind": "phone",
+      "value": "416-555-0195"
+    },
+    {
+      "id": "pii-041",
+      "kind": "ssn",
+      "value": "000-10-5438"
+    },
+    {
+      "id": "pii-042",
+      "kind": "ssn",
+      "value": "000-11-2099"
+    },
+    {
+      "id": "pii-043",
+      "kind": "ssn",
+      "value": "000-12-1340"
+    },
+    {
+      "id": "pii-044",
+      "kind": "ssn",
+      "value": "000-13-8259"
+    },
+    {
+      "id": "pii-045",
+      "kind": "ssn",
+      "value": "000-14-2815"
+    },
+    {
+      "id": "pii-046",
+      "kind": "ssn",
+      "value": "000-15-6941"
+    },
+    {
+      "id": "pii-047",
+      "kind": "ssn",
+      "value": "000-16-6696"
+    },
+    {
+      "id": "pii-048",
+      "kind": "ssn",
+      "value": "000-17-2741"
+    },
+    {
+      "id": "pii-049",
+      "kind": "ssn",
+      "value": "000-18-3435"
+    },
+    {
+      "id": "pii-050",
+      "kind": "ssn",
+      "value": "000-19-7129"
+    },
+    {
+      "id": "pii-051",
+      "kind": "ssn",
+      "value": "000-20-8389"
+    },
+    {
+      "id": "pii-052",
+      "kind": "ssn",
+      "value": "000-21-6848"
+    },
+    {
+      "id": "pii-053",
+      "kind": "ssn",
+      "value": "000-22-6530"
+    },
+    {
+      "id": "pii-054",
+      "kind": "ssn",
+      "value": "000-23-5932"
+    },
+    {
+      "id": "pii-055",
+      "kind": "ssn",
+      "value": "000-24-8839"
+    },
+    {
+      "id": "pii-056",
+      "kind": "sin",
+      "value": "000-776-254"
+    },
+    {
+      "id": "pii-057",
+      "kind": "sin",
+      "value": "000-732-357"
+    },
+    {
+      "id": "pii-058",
+      "kind": "sin",
+      "value": "000-755-254"
+    },
+    {
+      "id": "pii-059",
+      "kind": "sin",
+      "value": "000-567-425"
+    },
+    {
+      "id": "pii-060",
+      "kind": "sin",
+      "value": "000-627-244"
+    },
+    {
+      "id": "pii-061",
+      "kind": "sin",
+      "value": "000-807-680"
+    },
+    {
+      "id": "pii-062",
+      "kind": "sin",
+      "value": "000-674-548"
+    },
+    {
+      "id": "pii-063",
+      "kind": "sin",
+      "value": "000-533-975"
+    },
+    {
+      "id": "pii-064",
+      "kind": "sin",
+      "value": "000-375-504"
+    },
+    {
+      "id": "pii-065",
+      "kind": "sin",
+      "value": "000-843-492"
+    },
+    {
+      "id": "pii-066",
+      "kind": "name",
+      "value": "Alex Examplesworth"
+    },
+    {
+      "id": "pii-067",
+      "kind": "name",
+      "value": "Blair Placeholder"
+    },
+    {
+      "id": "pii-068",
+      "kind": "name",
+      "value": "Casey Fictionby"
+    },
+    {
+      "id": "pii-069",
+      "kind": "name",
+      "value": "Drew Imaginar"
+    },
+    {
+      "id": "pii-070",
+      "kind": "name",
+      "value": "Emery Fakeman"
+    },
+    {
+      "id": "pii-071",
+      "kind": "name",
+      "value": "Finley Dummyfield"
+    },
+    {
+      "id": "pii-072",
+      "kind": "name",
+      "value": "Harper Stubbs-Test"
+    },
+    {
+      "id": "pii-073",
+      "kind": "name",
+      "value": "Jules Madeupton"
+    },
+    {
+      "id": "pii-074",
+      "kind": "name",
+      "value": "Kendall Mockridge"
+    },
+    {
+      "id": "pii-075",
+      "kind": "name",
+      "value": "Logan Syntheton"
+    },
+    {
+      "id": "pii-076",
+      "kind": "name",
+      "value": "Morgan Fauxley"
+    },
+    {
+      "id": "pii-077",
+      "kind": "name",
+      "value": "Nico Testwood"
+    },
+    {
+      "id": "pii-078",
+      "kind": "name",
+      "value": "Parker Samplestein"
+    },
+    {
+      "id": "pii-079",
+      "kind": "name",
+      "value": "Quinn Notreal"
+    },
+    {
+      "id": "pii-080",
+      "kind": "name",
+      "value": "Reese Pretendell"
+    },
+    {
+      "id": "pii-081",
+      "kind": "card",
+      "value": "4000 0003 5945 7043"
+    },
+    {
+      "id": "pii-082",
+      "kind": "card",
+      "value": "4000 0027 6175 7739"
+    },
+    {
+      "id": "pii-083",
+      "kind": "card",
+      "value": "4000 0031 9615 6810"
+    },
+    {
+      "id": "pii-084",
+      "kind": "card",
+      "value": "4000 0042 9661 9319"
+    },
+    {
+      "id": "pii-085",
+      "kind": "card",
+      "value": "4000 0045 7786 2570"
+    },
+    {
+      "id": "pii-086",
+      "kind": "card",
+      "value": "4000 0054 9403 0787"
+    },
+    {
+      "id": "pii-087",
+      "kind": "card",
+      "value": "4000 0062 3815 8637"
+    },
+    {
+      "id": "pii-088",
+      "kind": "card",
+      "value": "4000 0079 9299 5693"
+    },
+    {
+      "id": "pii-089",
+      "kind": "card",
+      "value": "4000 0094 9892 2627"
+    },
+    {
+      "id": "pii-090",
+      "kind": "card",
+      "value": "4000 0096 7332 5158"
+    },
+    {
+      "id": "pii-091",
+      "kind": "card",
+      "value": "5555 5507 2956 2498"
+    },
+    {
+      "id": "pii-092",
+      "kind": "card",
+      "value": "5555 5511 8478 1235"
+    },
+    {
+      "id": "pii-093",
+      "kind": "card",
+      "value": "5555 5521 8974 5886"
+    },
+    {
+      "id": "pii-094",
+      "kind": "card",
+      "value": "5555 5524 8723 9780"
+    },
+    {
+      "id": "pii-095",
+      "kind": "card",
+      "value": "5555 5538 0316 9362"
+    },
+    {
+      "id": "pii-096",
+      "kind": "card",
+      "value": "5555 5544 5891 6883"
+    },
+    {
+      "id": "pii-097",
+      "kind": "card",
+      "value": "5555 5576 2937 1854"
+    },
+    {
+      "id": "pii-098",
+      "kind": "card",
+      "value": "5555 5578 5092 4223"
+    },
+    {
+      "id": "pii-099",
+      "kind": "card",
+      "value": "5555 5587 9153 2497"
+    },
+    {
+      "id": "pii-100",
+      "kind": "card",
+      "value": "5555 5596 3069 6600"
+    }
+  ],
+  "synthetic": true
+}

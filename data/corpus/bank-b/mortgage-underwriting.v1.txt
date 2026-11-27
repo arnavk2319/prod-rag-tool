@@ -1,0 +1,13 @@
+MORTGAGE UNDERWRITING GUIDE
+
+PURPOSE
+This is synthetic policy POL-3844 of Birch Test Credit Union. It exists only for software testing.
+
+POLICY
+The maximum loan-to-value ratio is 80 percent for owner-occupied homes. This is version 1 of the standard.
+
+EXCEPTIONS
+Exceptions require written approval from the policy owner, Alex Examplesworth.
+
+REVIEW
+Birch Test Credit Union reviews this policy every 12 months.

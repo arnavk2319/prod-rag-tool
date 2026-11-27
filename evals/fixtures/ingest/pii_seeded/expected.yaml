@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "file": "pii.md",
+      "outcome": "accepted",
+      "pii_class": "contains_pii",
+      "reason": "pii_redacted"
+    }
+  ],
+  "kind": "pii_seeded",
+  "note": "accepted only after redaction; indexed text must not contain the seeded values",
+  "tenant": "bank-a"
+}
