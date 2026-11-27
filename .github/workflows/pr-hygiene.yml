@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: { fetch-depth: 0, persist-credentials: false }
       - run: |
-          changed=$(git diff --name-only "$BASE...$HEAD" -- migrations/)
+          changed=$(git diff --name-only "$BASE...$HEAD" -- migrations/ | grep -vE '(^|/)\.gitkeep$' || true)
           [ -z "$changed" ] && { echo "no migration changes"; exit 0; }
           if gh pr view "$PR" --json labels --jq '.labels[].name' | grep -qx migration-approved; then
             echo "migration-approved label present"; exit 0
