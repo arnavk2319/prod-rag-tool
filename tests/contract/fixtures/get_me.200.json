@@ -1,0 +1,10 @@
+{
+  "labels": [
+    "finance"
+  ],
+  "roles": [
+    "analyst"
+  ],
+  "tenant_id": "ten_01",
+  "user_id": "usr_01"
+}

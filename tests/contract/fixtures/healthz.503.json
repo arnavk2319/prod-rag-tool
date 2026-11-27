@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "dependency_unavailable",
+    "message": "Provider unavailable",
+    "request_id": "req-0001-abcdef"
+  }
+}

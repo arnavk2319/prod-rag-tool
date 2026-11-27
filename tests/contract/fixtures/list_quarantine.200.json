@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "created_at": "2026-01-15T10:00:00Z",
+      "detail": "National id pattern",
+      "document_id": "doc_02",
+      "id": "q_01",
+      "reason": "pii_detected"
+    }
+  ],
+  "next_cursor": null
+}

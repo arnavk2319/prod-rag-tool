@@ -13,8 +13,8 @@ CASES: list[tuple[type[e.AppError], int, str]] = [
     (e.Conflict, 409, "conflict"),
     (e.PayloadTooLarge, 413, "payload_too_large"),
     (e.RateLimited, 429, "rate_limited"),
-    (e.UpstreamUnavailable, 503, "upstream_unavailable"),
-    (e.UpstreamTimeout, 504, "upstream_timeout"),
+    (e.UpstreamUnavailable, 503, "dependency_unavailable"),
+    (e.UpstreamTimeout, 504, "dependency_unavailable"),
     (e.Internal, 500, "internal_error"),
 ]
 
@@ -44,7 +44,7 @@ def test_exception_maps_to_status_and_envelope(
     assert set(body) == {"error"}
     assert body["error"]["code"] == code
     assert body["error"]["message"] == "msg"
-    assert "trace_id" in body["error"]
+    assert "request_id" in body["error"]
 
 
 def test_unhandled_exception_hides_detail() -> None:
@@ -66,7 +66,7 @@ def test_unknown_route_uses_envelope() -> None:
     assert r.json()["error"]["code"] == "not_found"
 
 
-def test_unhandled_500_carries_trace_id_in_body_and_header() -> None:
+def test_unhandled_500_carries_request_id_in_body_and_headers() -> None:
     from rag_platform.api.app import create_app
 
     app = create_app()
@@ -77,9 +77,10 @@ def test_unhandled_500_carries_trace_id_in_body_and_header() -> None:
 
     r = TestClient(app, raise_server_exceptions=False).get("/_boom")
     assert r.status_code == 500
-    tid = r.json()["error"]["trace_id"]
+    tid = r.json()["error"]["request_id"]
     assert tid
     assert r.headers["X-Trace-Id"] == tid
+    assert r.headers["X-Request-ID"] == tid
     assert "secret" not in r.text
 
 

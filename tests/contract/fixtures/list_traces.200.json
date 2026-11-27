@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "at": "2026-01-15T10:00:00Z",
+      "cache": "miss",
+      "latency_ms": 2140,
+      "message_id": "msg_01",
+      "outcome": "answered",
+      "served_model": "local-small",
+      "trace_id": "9f2c1d7a3b4e4f10"
+    }
+  ],
+  "next_cursor": null
+}

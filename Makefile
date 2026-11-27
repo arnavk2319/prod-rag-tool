@@ -1,4 +1,4 @@
-.PHONY: lint test typecheck verify
+.PHONY: lint test typecheck verify contract-update
 
 lint:
 	uv run ruff check . && uv run ruff format --check .
@@ -11,3 +11,6 @@ test:
 
 verify:
 	uv run ruff check . && uv run pytest -q
+
+contract-update:
+	uv run python scripts/contract_update.py

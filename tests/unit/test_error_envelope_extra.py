@@ -16,14 +16,14 @@ def test_unhandled_500_leaks_no_text_or_stack() -> None:
     assert "Traceback" not in r.text
     assert "RuntimeError" not in r.text
     assert "/srv/app.py" not in r.text
-    assert set(r.json()["error"]) == {"code", "message", "trace_id"}
+    assert set(r.json()["error"]) == {"code", "message", "request_id"}
 
 
 @pytest.mark.parametrize(("cls", "status", "code"), CASES)
 def test_every_error_body_has_exact_keys(cls: type[e.AppError], status: int, code: str) -> None:
     r = make_client(cls("m")).get("/boom")
-    assert set(r.json()["error"]) == {"code", "message", "trace_id"}
-    assert isinstance(r.json()["error"]["trace_id"], str)
+    assert set(r.json()["error"]) == {"code", "message", "request_id"}
+    assert isinstance(r.json()["error"]["request_id"], str)
 
 
 def test_trace_id_comes_from_context() -> None:
@@ -38,21 +38,21 @@ def test_trace_id_comes_from_context() -> None:
             raise e.Conflict("x")
 
         r = TestClient(app, raise_server_exceptions=False).get("/boom")
-        assert r.json()["error"]["trace_id"] == "abc123"
+        assert r.json()["error"]["request_id"] == "abc123"
     finally:
         structlog.contextvars.clear_contextvars()
 
 
-def test_validation_and_404_have_trace_id_key() -> None:
+def test_validation_and_404_have_request_id_key() -> None:
     c = make_client(RuntimeError())
-    assert "trace_id" in c.get("/typed?n=x").json()["error"]
-    assert "trace_id" in c.get("/nope").json()["error"]
+    assert "request_id" in c.get("/typed?n=x").json()["error"]
+    assert "request_id" in c.get("/nope").json()["error"]
 
 
 def test_non_404_http_error_uses_envelope() -> None:
     r = make_client(RuntimeError()).post("/boom")
     assert r.status_code == 405
-    assert r.json()["error"]["code"] == "http_error"
+    assert r.json()["error"]["code"] == "validation_failed"
 
 
 def test_all_errors_are_app_errors() -> None:
