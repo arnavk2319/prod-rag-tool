@@ -39,7 +39,7 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
-          bad=$(git diff --name-only --diff-filter=AM "$BASE...$HEAD" | grep -E '(^|/)(\.env(\..*)?|docs-internal/.*|\.claude/.*|AGENTS\.md|CLAUDE\.md|.*\.(pem|key|p12|pfx))$' | grep -Ev '(^|/)\.env\.example$' || true)
+          bad=$(git diff --name-only --diff-filter=AM "$BASE...$HEAD" | grep -E '(^|/)(\.env(\..*)?|docs-internal/.*|\.planning/.*|specs/.*|\.claude/.*|AGENTS\.md|CLAUDE\.md|.*\.(pem|key|p12|pfx))$' | grep -Ev '(^|/)\.env\.example$' || true)
           if [ -n "$bad" ]; then echo "These files must not be committed:"; echo "$bad"; exit 1; fi
 
   # Required check: migration-approval. Database migration changes need a human-applied label.

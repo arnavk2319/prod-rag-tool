@@ -1,7 +1,7 @@
 // PreToolUse hook (matcher Task|Agent) and CLI. Exit 2 at a cap, warn at 70%.
 // Hook: tool call JSON on stdin. CLI: node scripts/agentic/guard-budget.ts --ticket T-001 [--now ISO]
 import { readFileSync } from "node:fs";
-import { checkAll, type Check } from "./lib/budget.ts";
+import { checkAll, planningDir, type Check } from "./lib/budget.ts";
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(`--${name}`);
@@ -39,7 +39,7 @@ if (stops.length > 0) {
 }
 
 if (warns.length > 0) {
-  const msg = `BUDGET WARN (70%+): ${warns.map(fmt).join("; ")}. Tell the human in one line and add it to docs/status.md.`;
+  const msg = `BUDGET WARN (70%+): ${warns.map(fmt).join("; ")}. Tell the human in one line and add it to ${planningDir()}/status.md.`;
   process.stdout.write(
     JSON.stringify({
       systemMessage: msg,

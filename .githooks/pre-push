@@ -10,5 +10,11 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     echo "pre-push: a commit being pushed has AI attribution ($bad). Reword it (git rebase -i / git commit --amend) and push again." >&2
     exit 1
   fi
+  # private mode: planning files, .claude and CLAUDE.md must never be pushed
+  leak=$(git log --name-only --format= $range 2>/dev/null | grep -E '^(\.planning|\.claude|CLAUDE\.md|specs)(/|$)' | head -1)
+  if [ -n "$leak" ]; then
+    echo "pre-push: a commit being pushed contains private file $leak (planning, .claude and CLAUDE.md stay local). Remove it from the commit and push again." >&2
+    exit 1
+  fi
 done
 exit 0

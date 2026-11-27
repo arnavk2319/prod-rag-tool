@@ -7,6 +7,7 @@ import {
   costUsd,
   isUnusual,
   loadBudgets,
+  planningDir,
   readUsage,
   root,
   spendForTicket,
@@ -131,7 +132,7 @@ function currentTicket(agent: string, transcript: string): string {
 }
 
 function bumpTicket(ticket: string): void {
-  const f = join(root(), "docs", "tickets", `${ticket}.md`);
+  const f = join(root(), planningDir(), "tickets", `${ticket}.md`);
   if (ticket === "none" || !existsSync(f)) return;
   const spent = spendForTicket(readUsage(), ticket).toFixed(2);
   const txt = readFileSync(f, "utf8");
