@@ -1,4 +1,4 @@
-.PHONY: eval lint test typecheck verify contract-update up up-obs up-llm down clean urls doctor
+.PHONY: eval lint test typecheck verify contract-update up up-obs up-llm down clean urls doctor status
 
 lint:
 	uv run ruff check . && uv run ruff format --check .
@@ -41,3 +41,6 @@ urls:
 
 doctor:
 	@./scripts/doctor.sh
+
+status:
+	python scripts/status_doc.py --write

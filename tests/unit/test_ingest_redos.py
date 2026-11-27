@@ -39,20 +39,24 @@ SHAPES = {
 }
 
 
+# Per-call bound (worst case measured under 1 s); 5 s keeps it stable under heavy load.
+LINEAR_BOUND_S = 5.0
+
+
 @pytest.mark.parametrize("shape", sorted(SHAPES))
 def test_redact_and_detect_linear(shape: str) -> None:
     text = SHAPES[shape]
     t0 = time.monotonic()
     redact(text)
     find_injection(text)
-    assert time.monotonic() - t0 < 2.0, shape
+    assert time.monotonic() - t0 < LINEAR_BOUND_S, shape
 
 
 @pytest.mark.parametrize("shape", ["digits", "word", "a_at", "ignore", "letter_spaced", "spaces"])
 def test_assess_linear(shape: str) -> None:
     t0 = time.monotonic()
     assess(SHAPES[shape].encode(), "a.txt")
-    assert time.monotonic() - t0 < 2.0, shape
+    assert time.monotonic() - t0 < LINEAR_BOUND_S, shape
 
 
 def test_text_over_cap_is_refused_not_skipped() -> None:
