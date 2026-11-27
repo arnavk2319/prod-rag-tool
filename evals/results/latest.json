@@ -43,8 +43,9 @@
     "pii_leak": 0
   },
   "header": "mechanism proof, not model quality (provider: fake-extractive)",
-  "inputs_hash": "11351f35478cd06e6b4cb416bd4a25e0023c7bb3b832639300e6a68c39f764ec",
+  "inputs_hash": "4a8ba14106a55cf06e450d74c9e6ab53cfc8e93a8ed6de58a6cf98ef12ff5834",
   "metrics": {
+    "chunk_determinism": 1.0,
     "injection_block_rate": 1.0,
     "mrr": 1.0,
     "pii_recall": 1.0,

@@ -16,7 +16,7 @@ def test_defaults() -> None:
     s = Settings(_env_file=None)  # type: ignore[call-arg]
     assert s.app_env == "local"
     assert s.provider == "fake"
-    assert s.embedding_backend == "fake"
+    assert s.embedding_backend == "hash"
     assert s.user_daily_token_cap == 200_000
     assert s.cache_ttl_s == 300
     assert s.rate_limit_user_rpm == 30

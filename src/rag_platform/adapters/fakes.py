@@ -2,9 +2,12 @@
 
 import hashlib
 import math
+import threading
 from collections.abc import Sequence
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 
+from rag_platform.domain.documents import DocStatus, Document, Outcome
 from rag_platform.domain.ports import (
     AuditEvent,
     Chunk,
@@ -173,3 +176,53 @@ class FakeAuditLog:
 
     async def list_events(self, tenant_id: str) -> list[AuditEvent]:
         return [e for e in self._events if e.tenant_id == tenant_id]
+
+
+class FakeDocumentRepository:
+    """In-memory documents table; enforces UNIQUE (tenant_id, doc_hash) and tenant-scoped keys."""
+
+    def __init__(self) -> None:
+        self._rows: dict[tuple[str, str], Document] = {}  # (tenant_id, doc_id)
+        self._lock = threading.Lock()
+
+    async def register(
+        self, tenant_id: str, doc_hash: str, doc_id: str, title: str
+    ) -> tuple[Document, Outcome]:
+        with self._lock:  # no await inside: atomic across tasks and threads
+            for d in self._rows.values():
+                if d.tenant_id == tenant_id and d.doc_hash == doc_hash:
+                    if d.status == "retired":
+                        d = replace(d, status="active")
+                        self._rows[(tenant_id, d.doc_id)] = d
+                        return d, "reactivated"
+                    return d, "duplicate"
+            if (tenant_id, doc_id) in self._rows:
+                raise ValueError("unique violation: (tenant_id, doc_id)")
+            doc = Document(doc_id, tenant_id, doc_hash, title)
+            self._rows[(tenant_id, doc_id)] = doc
+            return doc, "created"
+
+    def _find(self, tenant_id: str, doc_hash: str) -> Document | None:
+        for d in self._rows.values():
+            if d.tenant_id == tenant_id and d.doc_hash == doc_hash:
+                return d
+        return None
+
+    async def get_by_hash(self, tenant_id: str, doc_hash: str) -> Document | None:
+        with self._lock:
+            return self._find(tenant_id, doc_hash)
+
+    async def insert(self, doc: Document) -> Document:
+        with self._lock:
+            if self._find(doc.tenant_id, doc.doc_hash) is not None:
+                raise ValueError("unique violation: (tenant_id, doc_hash)")
+            if (doc.tenant_id, doc.doc_id) in self._rows:
+                raise ValueError("unique violation: (tenant_id, doc_id)")
+            self._rows[(doc.tenant_id, doc.doc_id)] = doc
+            return doc
+
+    async def set_status(self, tenant_id: str, doc_id: str, status: DocStatus) -> Document:
+        with self._lock:
+            doc = replace(self._rows[(tenant_id, doc_id)], status=status)
+            self._rows[(tenant_id, doc_id)] = doc
+            return doc
