@@ -3,10 +3,7 @@ docs/
 logs/
 agentic-kit/
 agentic_kit/
-evals/
-scripts/
 worktrees/
-tests/
 CLAUDE.md
 .claude/
 test-results/
