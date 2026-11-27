@@ -1,4 +1,4 @@
-.PHONY: lint test typecheck verify contract-update up up-obs up-llm down clean urls doctor
+.PHONY: eval lint test typecheck verify contract-update up up-obs up-llm down clean urls doctor
 
 lint:
 	uv run ruff check . && uv run ruff format --check .
@@ -11,6 +11,9 @@ test:
 
 verify:
 	uv run ruff check . && uv run pytest -q
+
+eval:
+	uv run python -m evals.run --suite smoke
 
 contract-update:
 	uv run python scripts/contract_update.py
