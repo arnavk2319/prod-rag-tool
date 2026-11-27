@@ -278,4 +278,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.execute("DROP FUNCTION IF EXISTS create_chunks_partition(text)")
     op.execute("DROP FUNCTION IF EXISTS audit_log_append_only() CASCADE")
+    # TABLE_NAMES is a module-level constant tuple of this migration's own tables; no external input
+    # reaches the statement, so the formatted-SQL rules do not apply.
+    # nosemgrep
     op.execute(f"DROP TABLE IF EXISTS {TABLE_NAMES} CASCADE")
