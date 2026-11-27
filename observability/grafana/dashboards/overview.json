@@ -1,0 +1,18 @@
+{
+  "uid": "rag-overview",
+  "title": "RAG Platform overview (stub)",
+  "schemaVersion": 39,
+  "version": 1,
+  "tags": ["rag"],
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "API scrape up",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"refId": "A", "expr": "up{job=\"api\"}"}]
+    }
+  ]
+}
