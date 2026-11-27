@@ -40,10 +40,11 @@
   },
   "hard_zero": {
     "cross_tenant_leakage": 0,
-    "pii_leak": 0
+    "pii_leak": 0,
+    "policy_violations": 0
   },
   "header": "mechanism proof, not model quality (provider: fake-extractive)",
-  "inputs_hash": "4a8ba14106a55cf06e450d74c9e6ab53cfc8e93a8ed6de58a6cf98ef12ff5834",
+  "inputs_hash": "7748a07211bc445fa7100ee6fec8624439673c3e5db2a531f81a1ab455e9bafe",
   "metrics": {
     "chunk_determinism": 1.0,
     "injection_block_rate": 1.0,
