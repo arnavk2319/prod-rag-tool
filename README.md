@@ -152,4 +152,4 @@ Every change is a separate pull request into `dev`, with a conventional commit t
 
 ## License
 
-License: to be decided before release.
+MIT. See [LICENSE](LICENSE).
