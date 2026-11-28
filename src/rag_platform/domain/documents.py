@@ -1,6 +1,7 @@
 """Document rows and the repository port (UNIQUE (tenant_id, doc_hash) in the schema)."""
 
 from dataclasses import dataclass
+from datetime import date
 from typing import Literal, Protocol
 
 DocStatus = Literal["active", "retired"]
@@ -15,6 +16,16 @@ class Document:
     title: str
     status: DocStatus = "active"
     version: int = 1
+
+
+@dataclass(frozen=True)
+class DocRow:
+    """An active document with the columns the ingest pipeline needs to (re)build its chunks."""
+
+    doc: Document
+    acl_labels: frozenset[str]
+    effective_date: date
+    expires_date: date | None
 
 
 class DocumentRepository(Protocol):

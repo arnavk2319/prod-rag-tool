@@ -26,7 +26,10 @@ from rag_platform.domain.policy import (
 )
 from rag_platform.services.policy_gate import ChunkSummary, PolicyGate, sync_pending
 
-OK = ChunkSummary(frozenset({("emb-1", "c1")}), 5)
+ALL_DOCS = frozenset({("a", "d1"), ("b", "d2")})
+
+
+OK = ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=8, documents_with_rows=ALL_DOCS)
 
 
 def draft(**kw: Any) -> PolicyDraft:
@@ -102,11 +105,15 @@ async def test_corpus_and_prompt_may_copy_forward(kind: ChangeKind) -> None:
 @pytest.mark.parametrize(
     "summary",
     [
-        ChunkSummary(frozenset(), 0),
-        ChunkSummary(frozenset({("emb-1", "c1"), ("emb-2", "c1")}), 4),
-        ChunkSummary(frozenset({("emb-1", "c1"), ("emb-1", "c0")}), 4),
-        ChunkSummary(frozenset({("other", "c1")}), 4),
-        ChunkSummary(frozenset({("emb-1", "c0")}), 4),
+        ChunkSummary(frozenset(), 0, dim=8, documents_with_rows=ALL_DOCS),
+        ChunkSummary(
+            frozenset({("emb-1", "c1"), ("emb-2", "c1")}), 4, dim=8, documents_with_rows=ALL_DOCS
+        ),
+        ChunkSummary(
+            frozenset({("emb-1", "c1"), ("emb-1", "c0")}), 4, dim=8, documents_with_rows=ALL_DOCS
+        ),
+        ChunkSummary(frozenset({("other", "c1")}), 4, dim=8, documents_with_rows=ALL_DOCS),
+        ChunkSummary(frozenset({("emb-1", "c0")}), 4, dim=8, documents_with_rows=ALL_DOCS),
     ],
 )
 async def test_verify_fails_and_rejects(summary: ChunkSummary) -> None:
@@ -283,7 +290,10 @@ async def test_verify_fails_on_dimension_mismatch() -> None:
     gate, repo, *_ = make()
     p = await gate.declare(draft(), declared_by="t")
     with pytest.raises(PolicyRuleViolation):
-        await gate.verify(p.policy_id, ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=9))
+        await gate.verify(
+            p.policy_id,
+            ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=9, documents_with_rows=ALL_DOCS),
+        )
     got = await repo.get(p.policy_id)
     assert got is not None and got.status is PolicyStatus.REJECTED
 
