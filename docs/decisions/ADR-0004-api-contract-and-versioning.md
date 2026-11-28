@@ -40,3 +40,7 @@ The web UI, the ops views and the backend are built at different times. Without 
 - The UI client is generated from the snapshot, so UI and API cannot diverge.
 - Small recurring cost: each contract change must update the snapshot and client.
 - Streaming messages are deferred; adding them later is an additive `/v1` change.
+
+## Addendum: policy hash
+
+- `versions.policy_hash` (optional string, nullable) is added to the `Versions` object of the message schema: the hash of the pipeline policy behind the index version that served the answer (ADR-0006). Additive only; clients that ignore it keep working.

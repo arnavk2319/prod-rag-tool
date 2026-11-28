@@ -42,6 +42,17 @@ Alembic `0003` (down_revision `0002`, the parent_chunks migration) adds:
 - Grants for `rag_app`: SELECT, INSERT on both tables; UPDATE only on status, timestamp and MLflow columns of `pipeline_policies`; no DELETE; `policy_documents` insert/select only.
 Requires the migration-approved label; downgrade drops in reverse order.
 
+**As built (SQL, migration 0003).** `policy_id` is a uuid; enums are CHECK constraints; `policy_hash` must be 64 hex chars; `UNIQUE (index_version, policy_hash)`; a partial index on `NOT mlflow_synced` serves the outbox. `pipeline_policies.doc_tenants` records the tenants touched so the repository can read `policy_documents` tenant by tenant under RLS (fail closed without `app.tenant_id`). A trigger rejects any change of a declared column, for every role, on top of the column-level grant. `index_versions` gains `policy_id` and a denormalised `policy_hash`, and a status CHECK (building, staged, committed, rolled_back, rejected, failed; 0001 had none). `audit_append()` is a SQL function that takes an advisory lock, chains `prev_hash` and `hash` (sha256 over the previous hash and the event fields) and inserts the audit row inside the caller's transaction. The repository (`SqlPolicyRepository`) opens one transaction per call: `UPDATE ... WHERE status = expected` on the policy and on the `index_versions` row (zero rows raises `IllegalTransition`), then the audit row; any failure rolls all of it back. `SqlEvalRuns` reads `gate_runs` and passes only when `passed` is true and every stored metric is a finite number. The gate is not yet wired into an ingest job (no ingest pipeline exists yet).
+
+**Known limits of the as-built SQL layer (accepted for the foundation release).**
+- `pipeline_policies` has no row-level security: any tenant session of the application role can read `doc_tenants` and `change_reason`, so it can learn that another tenant has documents in an ingest run. The rows are system-level metadata served only through the admin API; revisit before any multi-customer deployment.
+- The table owner bypasses row-level security on `policy_documents` (RLS is enabled, not forced); the application must never connect as the owner.
+- The immutability trigger on the declared columns blocks every role, including the owner, but the owner or a superuser can disable it (`DISABLE TRIGGER`, `session_replication_role`).
+- Downgrade drops policy data (`pipeline_policies`, `policy_documents`) and keeps `audit_log` rows untouched.
+- The application role still holds INSERT on `audit_log`, so it can bypass `audit_append` and forge a chain link (the verify routine detects a forged link). `audit_log` has no row-level security. Both are to be closed in the follow-up tenant-RLS change, together with a two-integer advisory-lock key for `audit_append`.
+- The `index_versions` status CHECK is validated, so upgrading a database that holds a legacy status outside the six allowed values fails atomically.
+- Not yet built: wiring the gate into the ingest worker and its outbox, making `ChunkSummary.dim` and `documents_with_rows` mandatory there, an MLflow-based eval-run reader, and failing closed on an empty metrics object in the SQL eval-run reader.
+
 ## Alternatives rejected
 - MLflow as source of truth: couples ingest, commit and serving to an extra service and loses transactional consistency with `index_versions`.
 - Gate only after embed: wastes the embedding spend on a change nobody declared or justified, and cannot refuse copy-forward early.

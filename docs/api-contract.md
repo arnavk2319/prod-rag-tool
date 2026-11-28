@@ -23,3 +23,4 @@ Additive optional fields stay in `/v1`. Removals or semantic changes need `/v2`.
 - Headers: `Authorization: Bearer` on authenticated routes, `X-Request-ID` accepted and echoed, `Idempotency-Key` (optional) on `create_document`, `create_chat`, `create_message`. Idempotency and `Authorization` are declared in the contract but not yet enforced; stubs answer 501 without credentials.
 - Lists: `limit` (default 50, max 200) and `cursor`; response `{items, next_cursor}`.
 - Until real handlers exist, routes return `501` with the error envelope (`internal_error`, "not implemented").
+- `versions` on a message carries `index_version`, `embedding_model`, `prompt_version` and the optional `policy_hash` (pipeline policy of the serving index version, ADR-0006; absent for versions built before the policy gate).
