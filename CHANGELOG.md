@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 - Foundation (unreleased until tagged)
+## 0.1.0 - Foundation (released, tag `v0.1.0`)
 
 No end-to-end ingest, retrieval, generation or UI yet; see [docs/status.md](docs/status.md).
 Changes are tracked in pull requests (numbers below).
