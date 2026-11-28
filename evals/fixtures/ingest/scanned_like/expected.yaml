@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "file": "scanned.pdf",
+      "outcome": "quarantined",
+      "reason": "no_text_layer"
+    }
+  ],
+  "kind": "scanned_like",
+  "tenant": "bank-a"
+}

@@ -1,0 +1,23 @@
+{
+  "files": [
+    {
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "file": "card-limit.v1.md",
+      "outcome": "accepted",
+      "reason": null,
+      "status": "superseded"
+    },
+    {
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "file": "card-limit.v2.md",
+      "outcome": "accepted",
+      "reason": null,
+      "status": "active"
+    }
+  ],
+  "kind": "superseded",
+  "note": "v2 supersedes v1 for the same doc_id; v1 stays retrievable only for as_of before expires_date",
+  "tenant": "bank-a"
+}

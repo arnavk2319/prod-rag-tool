@@ -1,0 +1,36 @@
+# --- local-only runtime folders (private planning files are hidden via .git/info/exclude, see scripts/agentic/private-mode.ts)
+logs/
+worktrees/
+test-results/
+
+# --- secrets and env
+.env
+.env.*
+!.env.example
+
+# --- python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# --- node / web
+node_modules/
+web/dist/
+
+# --- editors and OS
+.DS_Store
+.idea/
+.vscode/
+
+# --- local data and artifacts
+mlruns/
+mlartifacts/
+*.log

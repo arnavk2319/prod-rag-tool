@@ -1,0 +1,482 @@
+{
+  "documents": [
+    {
+      "doc_id": "bank-a-card-limits",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "html",
+      "key_fact": "The daily ATM withdrawal limit is 600 dollars per card.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "8ca0c15feb124ab173ac9aefbee8debd3cbd78a496344e0c2745180eb576255e",
+      "source_file": "bank-a/card-limits.v1.html",
+      "status": "superseded",
+      "tenant": "bank-a",
+      "title": "Debit Card Limits",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-card-limits",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "html",
+      "key_fact": "The daily ATM withdrawal limit is 900 dollars per card.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "6b280ae1bfb72331a106f46385b7870c83e343693554dfc75e7fdc64fb030d80",
+      "source_file": "bank-a/card-limits.v2.html",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Debit Card Limits",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-a-complaints-handling",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "md",
+      "key_fact": "Every complaint is acknowledged within 5 business days.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "12d3d8124fdd45a3594059bcbfae4de86c9a7c5caee1d208fa4adbea69a1ea02",
+      "source_file": "bank-a/complaints-handling.v1.md",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Customer Complaints Handling",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-credit-adjudication",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "md",
+      "key_fact": "Applications with a score below 620 are declined automatically.",
+      "labels": [
+        "restricted-credit"
+      ],
+      "pii_class": "none",
+      "sha256": "7db0fe8f9b92c2d93338ebe47bd344e30b60b61fe4a23e6c1aa73ae080bfd2c5",
+      "source_file": "bank-a/credit-adjudication.v1.md",
+      "status": "superseded",
+      "tenant": "bank-a",
+      "title": "Consumer Credit Adjudication Rules",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-credit-adjudication",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "md",
+      "key_fact": "Applications with a score below 680 are declined automatically.",
+      "labels": [
+        "restricted-credit"
+      ],
+      "pii_class": "none",
+      "sha256": "244df9694a1d87111f32dd2562e0800a3c6a56c34539d9b427f1618ffb96a779",
+      "source_file": "bank-a/credit-adjudication.v2.md",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Consumer Credit Adjudication Rules",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-a-data-retention",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "pdf",
+      "key_fact": "Transaction records are retained for 7 years.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "c9e1404c738c458c51e44840f8a85fa19dcd6fc94cfe2777fc644c0035f2381d",
+      "source_file": "bank-a/data-retention.v1.pdf",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Records Retention Standard",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-fee-schedule",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "pdf",
+      "key_fact": "The monthly account fee is 12 dollars.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "ee503eb3e05c81aa1bb820d4ce48c92455712ec471f69d877392d165773a3af6",
+      "source_file": "bank-a/fee-schedule.v1.pdf",
+      "status": "superseded",
+      "tenant": "bank-a",
+      "title": "Personal Account Fee Schedule",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-fee-schedule",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "pdf",
+      "key_fact": "The monthly account fee is 8 dollars.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "03ae1b0cf14b30fda785e69633c1ae2804c8f4af74a5ec88a84b2c582d9cc19f",
+      "source_file": "bank-a/fee-schedule.v2.pdf",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Personal Account Fee Schedule",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-a-incident-response",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "html",
+      "key_fact": "Security incidents must be escalated within 6 hours of detection.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "ecc8499a82c735a289ca7289b49ae60801dee58847adb904ec1f03da5c7de733",
+      "source_file": "bank-a/incident-response.v1.html",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Security Incident Response Procedure",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-mortgage-underwriting",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "txt",
+      "key_fact": "The maximum loan-to-value ratio is 75 percent for owner-occupied homes.",
+      "labels": [
+        "restricted-credit"
+      ],
+      "pii_class": "none",
+      "sha256": "c2feb7e83c94431c2cd261499cf5013e86555ef18d813df42c4d0c29e8d520f2",
+      "source_file": "bank-a/mortgage-underwriting.v1.txt",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Mortgage Underwriting Guide",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-password-policy",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "md",
+      "key_fact": "Staff passwords must be at least 8 characters long.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "d54bf741d35d6259bc3dab0909824b650edde0aebdf6364df84a986ce9a280a9",
+      "source_file": "bank-a/password-policy.v1.md",
+      "status": "superseded",
+      "tenant": "bank-a",
+      "title": "Password and Credential Policy",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-password-policy",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "md",
+      "key_fact": "Staff passwords must be at least 14 characters long.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "7e0abc603bd59da12f6b2584eaab382dfe86d4cdbe3afc5393aa576ef0f25d5a",
+      "source_file": "bank-a/password-policy.v2.md",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Password and Credential Policy",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-a-wire-transfer-approval",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "txt",
+      "key_fact": "Outgoing wires above 7500 dollars require dual approval.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "3bf3d6f527cd26fe79b08efa6ba895b0af647a3665b145615e144a5baeb7a2b8",
+      "source_file": "bank-a/wire-transfer-approval.v1.txt",
+      "status": "superseded",
+      "tenant": "bank-a",
+      "title": "Wire Transfer Approval Standard",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-a-wire-transfer-approval",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "txt",
+      "key_fact": "Outgoing wires above 15000 dollars require dual approval.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "e27b0a6f7bc885735b1fb711d81c85c0a15e64c18da41530873518ccee7efe65",
+      "source_file": "bank-a/wire-transfer-approval.v2.txt",
+      "status": "active",
+      "tenant": "bank-a",
+      "title": "Wire Transfer Approval Standard",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-b-card-limits",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "html",
+      "key_fact": "The daily ATM withdrawal limit is 700 dollars per card.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "b69d8a2624bccc8b501f9d521be633e98f98d866dd21b21b352e022bae623650",
+      "source_file": "bank-b/card-limits.v1.html",
+      "status": "superseded",
+      "tenant": "bank-b",
+      "title": "Debit Card Limits",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-card-limits",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "html",
+      "key_fact": "The daily ATM withdrawal limit is 1000 dollars per card.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "cf628c7639aa48c2d5ee1e2b7f525778c6477e4e00da6514d72201c39f845c25",
+      "source_file": "bank-b/card-limits.v2.html",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Debit Card Limits",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-b-complaints-handling",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "md",
+      "key_fact": "Every complaint is acknowledged within 2 business days.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "602c20b13f6f72d052955f5f22d517535e34a348e019b42ba127b83de68e1b8f",
+      "source_file": "bank-b/complaints-handling.v1.md",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Customer Complaints Handling",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-credit-adjudication",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "md",
+      "key_fact": "Applications with a score below 640 are declined automatically.",
+      "labels": [
+        "restricted-credit"
+      ],
+      "pii_class": "none",
+      "sha256": "a4bedc44e0095325b6a9cbb1ef5ffaec48c8454c1a0ebd17c9538e26ade5072d",
+      "source_file": "bank-b/credit-adjudication.v1.md",
+      "status": "superseded",
+      "tenant": "bank-b",
+      "title": "Consumer Credit Adjudication Rules",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-credit-adjudication",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "md",
+      "key_fact": "Applications with a score below 700 are declined automatically.",
+      "labels": [
+        "restricted-credit"
+      ],
+      "pii_class": "none",
+      "sha256": "3bb69f0afb54aaf2f6a9647278363a14821e8a98d5f9c7e5a26df7f6ac41c328",
+      "source_file": "bank-b/credit-adjudication.v2.md",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Consumer Credit Adjudication Rules",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-b-data-retention",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "pdf",
+      "key_fact": "Transaction records are retained for 10 years.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "d78ec5e3dc5c0bd1a735c12b5de46cbf75337f411e944a4bd65d717c5ff4b62c",
+      "source_file": "bank-b/data-retention.v1.pdf",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Records Retention Standard",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-fee-schedule",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "pdf",
+      "key_fact": "The monthly account fee is 14 dollars.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "5a6bca794a5367abebfa36a532189e5229d6aa1c91ee44296f67a8e4303320dd",
+      "source_file": "bank-b/fee-schedule.v1.pdf",
+      "status": "superseded",
+      "tenant": "bank-b",
+      "title": "Personal Account Fee Schedule",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-fee-schedule",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "pdf",
+      "key_fact": "The monthly account fee is 9 dollars.",
+      "labels": [
+        "public"
+      ],
+      "pii_class": "none",
+      "sha256": "4566186d9f53ee1f4462e1a4eb0ca15860d993aa8626c1916dfbcdba4748d526",
+      "source_file": "bank-b/fee-schedule.v2.pdf",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Personal Account Fee Schedule",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-b-incident-response",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "html",
+      "key_fact": "Security incidents must be escalated within 2 hours of detection.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "28f751e7a80bfacd61f1e3eb6ad1c1a99e6e8174e5dcdf1cd437a8e9a013ff00",
+      "source_file": "bank-b/incident-response.v1.html",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Security Incident Response Procedure",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-mortgage-underwriting",
+      "effective_date": "2024-01-01",
+      "expires_date": null,
+      "format": "txt",
+      "key_fact": "The maximum loan-to-value ratio is 80 percent for owner-occupied homes.",
+      "labels": [
+        "restricted-credit"
+      ],
+      "pii_class": "none",
+      "sha256": "791e7e2c6a5065283108d158600320989b5b14efe3d15d5e208c742077896db8",
+      "source_file": "bank-b/mortgage-underwriting.v1.txt",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Mortgage Underwriting Guide",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-password-policy",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "md",
+      "key_fact": "Staff passwords must be at least 10 characters long.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "27735eda8aeb274119fee074c9e28e1b5b422da22294249c4e7b88debb9ecc49",
+      "source_file": "bank-b/password-policy.v1.md",
+      "status": "superseded",
+      "tenant": "bank-b",
+      "title": "Password and Credential Policy",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-password-policy",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "md",
+      "key_fact": "Staff passwords must be at least 16 characters long.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "461d50c627306102371ecef5f5596665c8013093e8371d40cf13358d028ec878",
+      "source_file": "bank-b/password-policy.v2.md",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Password and Credential Policy",
+      "version": 2
+    },
+    {
+      "doc_id": "bank-b-wire-transfer-approval",
+      "effective_date": "2023-01-01",
+      "expires_date": "2024-07-01",
+      "format": "txt",
+      "key_fact": "Outgoing wires above 9000 dollars require dual approval.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "9f77dad130720e7f368ada149da16e835b4d1c01f5fab5d2e08d4ebd04d449ad",
+      "source_file": "bank-b/wire-transfer-approval.v1.txt",
+      "status": "superseded",
+      "tenant": "bank-b",
+      "title": "Wire Transfer Approval Standard",
+      "version": 1
+    },
+    {
+      "doc_id": "bank-b-wire-transfer-approval",
+      "effective_date": "2024-07-01",
+      "expires_date": null,
+      "format": "txt",
+      "key_fact": "Outgoing wires above 20000 dollars require dual approval.",
+      "labels": [
+        "internal"
+      ],
+      "pii_class": "none",
+      "sha256": "33bf11e9be3c8006438033457136485fadc373f19d09a08ea09f6a5f2fe67579",
+      "source_file": "bank-b/wire-transfer-approval.v2.txt",
+      "status": "active",
+      "tenant": "bank-b",
+      "title": "Wire Transfer Approval Standard",
+      "version": 2
+    }
+  ],
+  "schema": "documents(doc_id, tenant_id, version, acl_labels, effective_date, expires_date, status)",
+  "synthetic": true
+}

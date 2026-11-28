@@ -1,0 +1,28 @@
+{
+  "answer_status": "answered",
+  "cache": "miss",
+  "chat_id": "chat_01",
+  "citations": [
+    {
+      "chunk_id": "chunk_07",
+      "document_id": "doc_01",
+      "parent_id": "parent_03",
+      "span": {
+        "end": 188,
+        "start": 120
+      }
+    }
+  ],
+  "content": "Economy class is required for flights under 6 hours [1].",
+  "created_at": "2026-01-15T10:00:00Z",
+  "id": "msg_01",
+  "latency_ms": 2140,
+  "served_model": "local-small",
+  "trace_id": "9f2c1d7a3b4e4f10",
+  "versions": {
+    "embedding_model": "embed-small-v1",
+    "index_version": "idx_3",
+    "policy_hash": "3f1c0a9d5b7e2c4a8d6f1b3e5a7c9d0e2f4a6b8c0d1e3f5a7b9c1d3e5f7a9b0c",
+    "prompt_version": "answer-v1"
+  }
+}

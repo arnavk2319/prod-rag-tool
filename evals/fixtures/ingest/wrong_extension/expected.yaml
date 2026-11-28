@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "file": "report.pdf",
+      "note": "markdown bytes with .pdf extension",
+      "outcome": "rejected",
+      "reason": "type_mismatch"
+    }
+  ],
+  "kind": "wrong_extension",
+  "tenant": "bank-a"
+}

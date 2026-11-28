@@ -1,0 +1,11 @@
+{
+  "files": [
+    {
+      "file": "injected.md",
+      "outcome": "quarantined",
+      "reason": "prompt_injection_suspected"
+    }
+  ],
+  "kind": "injected",
+  "tenant": "bank-a"
+}

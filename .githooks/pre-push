@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Rejects a push that contains commits with AI attribution (catches commits made with --no-verify or
+# other tools). Scans only the commits being pushed.
+zero=0000000000000000000000000000000000000000
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue
+  if [ "$remote_sha" = "$zero" ]; then range="$local_sha --not --remotes"; else range="$remote_sha..$local_sha"; fi
+  bad=$(git log --format='%H%n%B%n----' $range 2>/dev/null | grep -Ein '^[[:space:]]*co-authored-by:.*(claude|anthropic|copilot|gpt|openai|gemini|cursor|codex|\bai\b|\bbot\b|noreply@anthropic)|generated (with|by) .*(claude|anthropic|copilot|\bai\b)|🤖' | head -1)
+  if [ -n "$bad" ]; then
+    echo "pre-push: a commit being pushed has AI attribution ($bad). Reword it (git rebase -i / git commit --amend) and push again." >&2
+    exit 1
+  fi
+  # private mode: planning files, .claude and CLAUDE.md must never be pushed
+  leak=$(git log --name-only --format= $range 2>/dev/null | grep -E '^(\.planning|\.claude|CLAUDE\.md|specs)(/|$)' | head -1)
+  if [ -n "$leak" ]; then
+    echo "pre-push: a commit being pushed contains private file $leak (planning, .claude and CLAUDE.md stay local). Remove it from the commit and push again." >&2
+    exit 1
+  fi
+done
+exit 0

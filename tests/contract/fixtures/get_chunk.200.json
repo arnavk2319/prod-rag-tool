@@ -1,0 +1,16 @@
+{
+  "chunk_id": "chunk_07",
+  "document_id": "doc_01",
+  "document_title": "Travel policy",
+  "heading_path": [
+    "Travel",
+    "Flights"
+  ],
+  "page": 3,
+  "parent_id": "parent_03",
+  "span": {
+    "end": 188,
+    "start": 120
+  },
+  "text": "Economy class is required for flights under 6 hours."
+}

@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    cooldown: { default-days: 7 }
+    groups:
+      actions: { patterns: ["*"] }
+  # Add these when the files exist (P1), otherwise Dependabot reports a missing manifest:
+  #   - package-ecosystem: uv            directory: /      (pyproject.toml, uv.lock)
+  #   - package-ecosystem: npm           directory: /web   (package.json)
+  #   - package-ecosystem: docker        directory: /docker, docker-compose directory: /
+  # each with: schedule weekly, cooldown 7 days, group minor-and-patch, open-pull-requests-limit 5
