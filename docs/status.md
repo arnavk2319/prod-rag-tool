@@ -24,7 +24,7 @@ the Choice column states what is not yet built.
 | Chunker | Parent-child chunking `pc-300-1200-v1`: parents of about 1200 tokens (no overlap, tile the document) are returned; children of about 300 tokens (12% overlap inside one parent, never crossing a parent) are embedded and searched; heading path kept; sizes are settings. Tables can still be split across chunks. The earlier single-level chunker (#13) is replaced | in review | T-009, T-044 | #13, #18 | 19 |
 | Embedder | `BAAI/bge-small-en-v1.5` via fastembed (384 dims) and a deterministic hash embedder for tests and gates | merged | T-009 | #13 | 2, 7 |
 | Reranker | Cross-encoder adapter merged; not used by any retrieval path yet | merged | T-009 | #13 | 2, 7 |
-| Policy gate | Core logic merged (#17) against in-memory fakes; SQL tables (migration 0003), `SqlPolicyRepository`, `SqlEvalRuns` and the additive `versions.policy_hash` contract field are built. Not built yet: wiring into an ingest job (no ingest pipeline yet). Postgres authoritative, MLflow mirror best effort | in progress | T-045 | #17 | 20 |
+| Policy gate | Core logic merged (#17) against in-memory fakes; SQL tables (migration 0003), `SqlPolicyRepository`, `SqlEvalRuns` and the additive `versions.policy_hash` contract field are built; an eval run with no metrics counts as not passed, a dangling parent policy or a NUL byte in a field is a validation error, and audit rows are appended only through the `audit_append` function. Not built yet: wiring into an ingest job (no ingest pipeline yet). Postgres authoritative, MLflow mirror best effort | in progress | T-045 | #17 | 20 |
 | Index versions | Schema only (policy tables and `index_versions.policy_id` added by 0003; list-partitioned `chunks` and, in review, `parent_chunks`; `index_versions`, `index_alias`). No build, gate, alias swap or rollback code yet | planned | T-003, T-011 | #7 | 5 |
 | Vector store | Postgres 16 with pgvector 0.8 (per-partition HNSW index DDL exists; nothing is populated or queried yet) | merged | T-003, T-004 | #7, #8 | 3, 6 |
 | Retrieval | Hybrid vector plus full-text in one SQL round trip with tenant and ACL filters inside the query. Not built | planned | T-012, T-013 | - | 4, 6 |
@@ -32,7 +32,7 @@ the Choice column states what is not yet built.
 | Verifier | Code verifier (citation, quote and number checks) and the extractive provider. Not built | planned | T-017 | - | 7, 8 |
 | Guardrails | Prompt versions, input and output guards, abstention below the rerank floor. Not built | planned | T-018 | - | 7, 8 |
 | API | Contract v1 (OpenAPI snapshot, error envelope, fixtures) and stub routes answering 501. No real handlers | merged | T-043 | #9 | 16 |
-| Auth and tenancy | Database roles and row-level security policies exist in the schema. Login, JWT, RBAC and per-request tenant context are not built | planned | T-023 | - | 4 |
+| Auth and tenancy | Database roles and row-level security on every tenant table (migration 0004, catalogue-tested) and an append-only, function-only audit log exist in the schema. Login, JWT, RBAC and per-request tenant context are not built | planned | T-023 | - | 4 |
 | Web console | Console UI (chat with citation pills and model badge, ingest status, versions, traces). Nothing built | planned | T-042, T-029, T-030 | - | 15 |
 | Evals | Harness, deterministic smoke run, `make eval`, case-level regression check, policy check, synthetic corpus. Golden set and thresholds are still being promoted | merged | T-005, T-007 | #10, #11 | 11, 12, 13 |
 | Observability | Structured logging and a metrics endpoint skeleton. Traces table exists in the schema; trace writer, dashboards and alert rules are not built | planned | T-020, T-035 | - | 9, 17 |
@@ -93,7 +93,7 @@ available; otherwise the block is left as committed.
 | T-044 | Parent-child chunking: children 300 tokens embedded, parents 1200 tokens returned | P2 | merged | T-003, T-009 | [#18](https://github.com/arnavk2319/prod-rag-tool/pull/18) |
 | T-045 | Pipeline policy gate: declare, verify, record in Postgres, mirror to MLflow | P2 | merged | T-003, T-009 | [#17](https://github.com/arnavk2319/prod-rag-tool/pull/17) |
 | T-046 | Public status document and generator: what is planned, built and decided | P2 | merged | T-001 | [#16](https://github.com/arnavk2319/prod-rag-tool/pull/16) |
-| T-047 | Row-level security on every remaining tenant-scoped table | P2 | planned | T-003, T-045 | - |
+| T-047 | Row-level security on every remaining tenant-scoped table | P2 | in progress | T-003, T-045 | - |
 <!-- generated:tickets end -->
 
 ## 3. Currently built
@@ -114,7 +114,7 @@ Generated from code and config, so it cannot drift from the repository.
 | Vector store and index | Postgres with pgvector (`pgvector/pgvector:0.8.0-pg16`); tables `index_versions`, `index_alias`, `chunks` exist in the schema; the per-partition HNSW index DDL exists, but no index is populated or queried yet |
 | Registry | `registry_pointers` table exists in the schema; nothing writes it yet |
 | Database roles | `rag_app`, `rag_owner`, `rag_svc` |
-| Highest migration revision | `0003` |
+| Highest migration revision | `0004` |
 
 **Settings defaults** (`src/rag_platform/settings.py`, secrets and credentialed URLs omitted)
 

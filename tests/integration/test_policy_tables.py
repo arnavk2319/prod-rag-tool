@@ -719,7 +719,7 @@ async def test_sql_eval_runs_reader(dsn: str) -> None:
 
 
 def test_metrics_clean_pure() -> None:
-    assert metrics_clean({"a": 1, "b": 0.5}) and metrics_clean({})
+    assert metrics_clean({"a": 1, "b": 0.5}) and not metrics_clean({})  # empty fails closed
     assert not metrics_clean({"a": float("nan")}) and not metrics_clean({"a": True})
     assert not metrics_clean(None) and not metrics_clean({"a": float("inf")})
 
@@ -733,7 +733,7 @@ async def test_gate_flow_succeeds_with_mlflow_down(dsn: str) -> None:
     with _app(dsn) as c:
         c.execute(
             "INSERT INTO gate_runs (gate_run_id, kind, passed, metrics) "
-            "VALUES ('ev','eval',true,'{}')"
+            "VALUES ('ev','eval',true,jsonb_build_object('recall', 0.9))"
         )
     gate = PolicyGate(
         repo,

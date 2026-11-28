@@ -15,11 +15,16 @@ from typing import Any, LiteralString
 
 import psycopg
 from psycopg import sql
-from psycopg.errors import UniqueViolation
+from psycopg.errors import (
+    DataError,
+    ForeignKeyViolation,
+    InvalidTextRepresentation,
+    UniqueViolation,
+)
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from rag_platform.domain.errors import Conflict, NotFound
+from rag_platform.domain.errors import Conflict, NotFound, ValidationFailed
 from rag_platform.domain.policy import (
     ALLOWED,
     INDEX_STATUS,
@@ -143,6 +148,8 @@ class SqlPolicyRepository:
     @staticmethod
     async def _audit(conn: psycopg.AsyncConnection[dict[str, Any]], ev: AuditEvent) -> None:
         target = ev.detail.get("policy_id")
+        # audit_append (SECURITY DEFINER, 0004) only accepts the session's own tenant
+        await conn.execute(_SET_TENANT, (ev.tenant_id or "",))
         await conn.execute(
             _AUDIT,
             (ev.at, ev.tenant_id, ev.actor, ev.action, target, Jsonb(ev.detail)),
@@ -217,6 +224,10 @@ class SqlPolicyRepository:
                     await self._audit(conn, audit_event)
         except UniqueViolation as e:
             raise Conflict("policy already declared for this index version") from e
+        except ForeignKeyViolation as e:
+            raise ValidationFailed("parent policy does not exist") from e
+        except (InvalidTextRepresentation, DataError) as e:
+            raise ValidationFailed("a policy field holds a character the database refuses") from e
 
     async def get(self, policy_id: str) -> PipelinePolicy | None:
         if not _is_uuid(policy_id):

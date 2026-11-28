@@ -205,9 +205,11 @@ def test_audit_log_has_hash_chain_columns(dsn: str) -> None:
     assert {"prev_hash", "hash"} <= cols
 
 
-def test_app_role_can_append_audit_log(dsn: str) -> None:
+def test_app_role_can_append_audit_log_only_through_the_function(dsn: str) -> None:
     with _as_app(dsn) as c:
-        c.execute("INSERT INTO audit_log (actor, action) VALUES ('u','login')")
+        c.execute("SELECT audit_append(now(), NULL, 'u', 'login', NULL, '{}'::jsonb)")
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            c.execute("INSERT INTO audit_log (actor, action) VALUES ('u','login')")
 
 
 @pytest.mark.parametrize("stmt", ["UPDATE audit_log SET actor='x'", "DELETE FROM audit_log"])

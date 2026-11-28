@@ -1,7 +1,8 @@
 """EvalRunReader over `gate_runs` (ADR-0006): conservative, Postgres only.
 
-A run passes only when the row exists, its stored `passed` flag is true and every stored metric
-is a finite number. Anything else (missing row, bad metric payload) counts as not passed.
+A run passes only when the row exists, its stored `passed` flag is true and it has a non-empty
+metrics object whose values are all finite numbers. Anything else (missing row, empty or bad
+metric payload) counts as not passed.
 """
 
 import math
@@ -15,8 +16,8 @@ _SELECT: LiteralString = "SELECT passed, metrics FROM gate_runs WHERE gate_run_i
 
 
 def metrics_clean(metrics: Any) -> bool:
-    """Pure check: a dict whose values are all finite, non-bool numbers."""
-    if not isinstance(metrics, dict):
+    """Pure check: a non-empty dict whose values are all finite, non-bool numbers."""
+    if not isinstance(metrics, dict) or not metrics:
         return False
     try:
         return all(
