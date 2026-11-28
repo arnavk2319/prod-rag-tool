@@ -21,11 +21,11 @@ the Choice column states what is not yet built.
 | Parser | Text, Markdown, HTML and PDF extraction with limits. No OCR | merged | T-008 | #14 | 1, 13 |
 | Redaction | Structured PII (emails, phones, ids, cards and similar) redacted before indexing; person names are out of scope and listed as a gap | merged | T-008 | #14 | 1, 13 |
 | Quarantine | Unparseable, scanned, oversize or injection-flagged files are quarantined with a reason, never indexed | merged | T-008 | #14 | 1, 13 |
-| Chunker | Parent-child chunking `pc-300-1200-v1`: parents of about 1200 tokens (no overlap, tile the document) are returned; children of about 300 tokens (12% overlap inside one parent, never crossing a parent) are embedded and searched; heading path kept; sizes are settings. Tables can still be split across chunks. The earlier single-level chunker (#13) is replaced | in review | T-009, T-044 | #13, #18 | 19 |
+| Chunker | Parent-child chunking `pc-300-1200-v1`: parents of about 1200 tokens (no overlap, tile the document) are returned; children of about 300 tokens (12% overlap inside one parent, never crossing a parent) are embedded and searched; heading path kept; sizes are settings. Tables can still be split across chunks. The earlier single-level chunker (#13) is replaced | merged | T-009, T-044 | #13, #18 | 19 |
 | Embedder | `BAAI/bge-small-en-v1.5` via fastembed (384 dims) and a deterministic hash embedder for tests and gates | merged | T-009 | #13 | 2, 7 |
 | Reranker | Cross-encoder adapter merged; not used by any retrieval path yet | merged | T-009 | #13 | 2, 7 |
 | Policy gate | Core logic merged (#17) against in-memory fakes: policy model and hash, state machine, gate rules, MLflow mirror with outbox, `policy_violations` check. Not built yet: SQL tables, ingest wiring, API field. Postgres authoritative, MLflow mirror best effort | in progress | T-045 | #17 | 20 |
-| Index versions | Schema only (list-partitioned `chunks` and, in review, `parent_chunks`; `index_versions`, `index_alias`). No build, gate, alias swap or rollback code yet | planned | T-003, T-011 | #7 | 5 |
+| Index versions | Schema only (list-partitioned `chunks` and `parent_chunks`; `index_versions`, `index_alias`). No build, gate, alias swap or rollback code yet | planned | T-003, T-011 | #7 | 5 |
 | Vector store | Postgres 16 with pgvector 0.8 (per-partition HNSW index DDL exists; nothing is populated or queried yet) | merged | T-003, T-004 | #7, #8 | 3, 6 |
 | Retrieval | Hybrid vector plus full-text in one SQL round trip with tenant and ACL filters inside the query. Not built | planned | T-012, T-013 | - | 4, 6 |
 | Generation chain | Ollama-first ordered fallback, last tier deterministic extractive, no paid models. No wrapper, no config file, no prompts in use yet | planned | T-016, T-019 | - | 7, 8 |
@@ -56,7 +56,7 @@ available; otherwise the block is left as committed.
 | T-007 | Synthetic corpus and ingest fixtures | P2 | merged | T-001 | [#11](https://github.com/arnavk2319/prod-rag-tool/pull/11) |
 | T-008 | Parse, PII redaction, quarantine | P2 | merged | T-002, T-007 | [#14](https://github.com/arnavk2319/prod-rag-tool/pull/14) |
 | T-009 | Chunker and embedder adapters | P2 | merged | T-002 | [#13](https://github.com/arnavk2319/prod-rag-tool/pull/13) |
-| T-010 | Ingest pipeline: raw_objects store, worker, idempotency, copy-forward staging, delete and re-index | P2 | planned | T-003, T-008, T-009, T-044, T-045 | - |
+| T-010 | Ingest pipeline: raw_objects store, worker, idempotency, copy-forward staging, delete and re-index | P2 | planned | T-003, T-008, T-009, T-044, T-045, T-047 | - |
 | T-011 | Index version gate, atomic alias swap, rollback, retention | P2 | planned | T-010, T-045 | - |
 | T-012 | Hybrid retrieval (one SQL round trip) | P2 | planned | T-009, T-011, T-044 | - |
 | T-013 | Tenant, ACL and RLS leak tests with hard-zero metrics | P2 | planned | T-012, T-044 | - |
@@ -90,9 +90,10 @@ available; otherwise the block is left as committed.
 | T-041 | HUMAN: Gate B and D, release tag | P6 | planned | T-040 | - |
 | T-042 | Web foundation: Vite/React/TS/Tailwind scaffold, Console tokens, static Console prototype, shell, generated client, MSW mocks | P4 | planned | T-001, T-043 | - |
 | T-043 | OpenAPI contract v1: every endpoint, error model, fixtures, snapshot and contract test | P1 | merged | T-001, T-002 | [#9](https://github.com/arnavk2319/prod-rag-tool/pull/9) |
-| T-044 | Parent-child chunking: children 300 tokens embedded, parents 1200 tokens returned | P2 | in review | T-003, T-009 | [#18](https://github.com/arnavk2319/prod-rag-tool/pull/18) |
+| T-044 | Parent-child chunking: children 300 tokens embedded, parents 1200 tokens returned | P2 | merged | T-003, T-009 | [#18](https://github.com/arnavk2319/prod-rag-tool/pull/18) |
 | T-045 | Pipeline policy gate: declare, verify, record in Postgres, mirror to MLflow | P2 | merged | T-003, T-009 | [#17](https://github.com/arnavk2319/prod-rag-tool/pull/17) |
 | T-046 | Public status document and generator: what is planned, built and decided | P2 | merged | T-001 | [#16](https://github.com/arnavk2319/prod-rag-tool/pull/16) |
+| T-047 | Row-level security on every remaining tenant-scoped table | P2 | planned | T-003, T-045 | - |
 <!-- generated:tickets end -->
 
 ## 3. Currently built
@@ -256,7 +257,7 @@ Each entry gives the choice and the reason. Entries marked planned are decided b
     records, this page and technical docs are committed; the author's planning and private working
     files stay on the author's machine and are never committed. Reason: the repository should show
     the system and its evidence, not the planning process.
-19. **Parent-child chunking (in review).** Children of about 300 tokens are embedded and searched; the
+19. **Parent-child chunking.** Children of about 300 tokens are embedded and searched; the
     parent of about 1200 tokens is returned; only children are embedded; at most 3 parents are packed
     into a context budget of about 4000 tokens. Reason: small chunks match precisely while larger
     parents give the generator context, and children stay under the 512-wordpiece embedder limit. The
