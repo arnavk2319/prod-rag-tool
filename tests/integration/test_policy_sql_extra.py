@@ -41,7 +41,7 @@ from rag_platform.adapters.policy_fakes import (
 )
 from rag_platform.adapters.sql_eval_runs import SqlEvalRuns, metrics_clean
 from rag_platform.adapters.sql_policy_repository import SqlPolicyRepository
-from rag_platform.domain.errors import Conflict, NotFound
+from rag_platform.domain.errors import Conflict, NotFound, ValidationFailed
 from rag_platform.domain.policy import (
     ALLOWED,
     INDEX_STATUS,
@@ -83,6 +83,8 @@ def bad_rows(d: str, tz: str = "UTC") -> list[int]:
 
 
 def append(c: psycopg.Connection, n: int, actor: str = "a", action: str = "x") -> int:
+    # audit_append (0004) accepts only the session's own tenant: the session says "t1" first
+    c.execute("SELECT set_config('app.tenant_id', 't1', true)")
     row = c.execute(
         APPEND, (T0 + timedelta(seconds=n), "t1", actor, action, f"tg{n}", "{}")
     ).fetchone()
@@ -232,17 +234,17 @@ def test_audit_tamper_and_deletion_are_detected(dsn: str) -> None:
     assert ids[3] in bad_rows(dsn)  # the row after the gap no longer links
 
 
-def test_direct_insert_by_rag_app_is_possible_but_breaks_verification(dsn: str) -> None:
-    """Pin (gap): rag_app holds INSERT on audit_log, so it can bypass audit_append and fork the
-    chain; the verify routine detects a forged link (an app that computes valid hashes could
-    still forge: only audit_append, not the grant, makes the chain)."""
+def test_direct_insert_by_rag_app_is_denied(dsn: str) -> None:
+    """0004 revoked INSERT on audit_log: the chain can only be extended through audit_append."""
     with _app(dsn) as c:
         append(c, 1)
-        c.execute(
-            "INSERT INTO audit_log (actor, action, prev_hash, hash) "
-            "VALUES ('a','b','\\x00','\\x01')"
-        )
-    assert len(bad_rows(dsn)) == 1
+    with pytest.raises(psycopg.errors.InsufficientPrivilege):
+        with _app(dsn) as c:
+            c.execute(
+                "INSERT INTO audit_log (actor, action, prev_hash, hash) "
+                "VALUES ('a','b','\\x00','\\x01')"
+            )
+    assert bad_rows(dsn) == []
 
 
 def test_audit_function_privileges(dsn: str) -> None:
@@ -289,15 +291,14 @@ def test_audit_tamper_moving_field_boundary_is_detected(dsn: str) -> None:
     assert bad_rows(dsn) == [i]
 
 
-def test_audit_rows_have_no_tenant_isolation_yet(dsn: str) -> None:
-    """Pin (documented gap until the audit-RLS ticket): audit_log has a tenant_id column but no
-    RLS, so any rag_app session sees other tenants' audit rows."""
-    with _app(dsn) as c:
+def test_audit_rows_are_tenant_isolated(dsn: str) -> None:
+    """0004: audit_log has RLS, so a tenant session sees only its own audit rows."""
+    with _app(dsn, "tenant-b") as c:
         c.execute(APPEND, (T0, "tenant-b", "u", "login", None, "{}"))
     with _app(dsn, "tenant-a") as c:
         assert c.execute(
             "SELECT count(*) FROM audit_log WHERE tenant_id = 'tenant-b'"
-        ).fetchone() == (1,)
+        ).fetchone() == (0,)
 
 
 # (3) declared-column trigger ----------------------------------------------------------------
@@ -549,11 +550,11 @@ async def test_concurrent_create_same_hash_one_conflict(dsn: str) -> None:
 
 
 async def test_unknown_parent_policy_fails_and_leaves_nothing(dsn: str) -> None:
-    """Pin: a dangling parent_policy_id surfaces as a raw psycopg FK error (the fake accepts it);
-    the whole create (index row, documents, audit) rolls back."""
+    """A dangling parent_policy_id is a clean domain error (ValidationFailed; the fake accepts
+    it); the whole create (index row, documents, audit) rolls back."""
     repo = SqlPolicyRepository(dsn)
     p = make_policy("v1", parent=str(uuid.uuid4()))
-    with pytest.raises(psycopg.errors.ForeignKeyViolation):
+    with pytest.raises(ValidationFailed):
         await repo.create(p, audit_event=_event(p))
     assert _counts(dsn) == (0, None, None)
 
@@ -694,11 +695,11 @@ async def test_hostile_ids_and_hash_are_data(dsn: str) -> None:
 
 
 async def test_nul_byte_is_refused_and_leaves_nothing(dsn: str) -> None:
-    """Pin: NUL cannot be stored in text; the driver raises (a raw psycopg DataError, not a
-    domain error) and the whole create rolls back."""
+    """NUL cannot be stored in text; the repository maps it to ValidationFailed and the whole
+    create rolls back."""
     repo = SqlPolicyRepository(dsn)
     p = make_policy("v1", reason="bad\x00reason")
-    with pytest.raises(psycopg.errors.DataError):
+    with pytest.raises(ValidationFailed):
         await repo.create(p, audit_event=_event(p))
     assert _counts(dsn) == (0, None, None)
 
@@ -796,11 +797,11 @@ async def test_eval_reader_passed_flag_missing_run_and_nan_literal(dsn: str) -> 
         _gate_run(dsn, "nan", True, '{"r": NaN}')
 
 
-async def test_eval_reader_empty_metrics_pass_vacuously(dsn: str) -> None:
-    """Pin (existing unit test also asserts metrics_clean({}) is True): a passed run with no
-    metrics at all counts as passed. gate_runs.metrics defaults to '{}'."""
+async def test_eval_reader_empty_metrics_fail_closed(dsn: str) -> None:
+    """A passed run with no metrics at all does not count as passed (gate_runs.metrics
+    defaults to '{}')."""
     _gate_run(dsn, "empty", True, "{}")
-    assert await SqlEvalRuns(dsn).passed("empty") is True
+    assert await SqlEvalRuns(dsn).passed("empty") is False
 
 
 async def test_eval_reader_huge_integer_metric_fails_closed(dsn: str) -> None:
