@@ -58,6 +58,9 @@ from rag_platform.services.policy_gate import (
     sync_pending,
 )
 
+ALL_DOCS = frozenset({("a", "d1"), ("b", "d2")})
+
+
 pytestmark = pytest.mark.integration
 
 VERIFY = """
@@ -830,7 +833,7 @@ def _draft(version: str, parent: str | None, reason: str = "refresh") -> PolicyD
     return PolicyDraft(**{k: getattr(p, k) for k in PolicyDraft.model_fields})
 
 
-OK_SUMMARY = ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=8)
+OK_SUMMARY = ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=8, documents_with_rows=ALL_DOCS)
 
 
 async def _snapshot(repo: PolicyRepository, versions: list[str]) -> list[Any]:
@@ -867,7 +870,10 @@ async def _failed_verify(repo: PolicyRepository, audit: FakeAuditLog) -> list[An
     gate, clock = _gate(repo, mirror, audit)
     d = await gate.declare(_draft("v1", None), declared_by="op")
     with pytest.raises(PolicyRuleViolation):
-        await gate.verify(d.policy_id, ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=99))
+        await gate.verify(
+            d.policy_id,
+            ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=99, documents_with_rows=ALL_DOCS),
+        )
     out: list[Any] = [await _snapshot(repo, ["v1"])]
     with pytest.raises(IllegalTransition):  # rejected is terminal
         await gate.verify(d.policy_id, OK_SUMMARY)

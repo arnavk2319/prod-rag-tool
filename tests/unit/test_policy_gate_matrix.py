@@ -25,6 +25,9 @@ from rag_platform.domain.policy import (
 from rag_platform.services.policy_gate import ChunkSummary, PolicyGate, sync_one, sync_pending
 from tests.unit.test_policy_gate import OK, draft, make
 
+ALL_DOCS = frozenset({("a", "d1"), ("b", "d2")})
+
+
 S = PolicyStatus
 ORDER = [S.DECLARED, S.VERIFIED, S.INDEXED, S.COMMITTED, S.ROLLED_BACK]
 
@@ -317,12 +320,16 @@ async def test_corpus_commit_without_eval_and_allow_copy_forward(
 @pytest.mark.parametrize(
     "summary",
     [
-        ChunkSummary(frozenset({("emb-1", "c1"), ("emb-2", "c1")}), 5),
-        ChunkSummary(frozenset({("emb-1", "c1"), ("emb-1", "c2")}), 5),
-        ChunkSummary(frozenset(), 0),
-        ChunkSummary(frozenset({("emb-1", "c1")}), 0),
-        ChunkSummary(frozenset({("emb-9", "c1")}), 5),
-        ChunkSummary(frozenset({("emb-1", "c9")}), 5),
+        ChunkSummary(
+            frozenset({("emb-1", "c1"), ("emb-2", "c1")}), 5, dim=8, documents_with_rows=ALL_DOCS
+        ),
+        ChunkSummary(
+            frozenset({("emb-1", "c1"), ("emb-1", "c2")}), 5, dim=8, documents_with_rows=ALL_DOCS
+        ),
+        ChunkSummary(frozenset(), 0, dim=8, documents_with_rows=ALL_DOCS),
+        ChunkSummary(frozenset({("emb-1", "c1")}), 0, dim=8, documents_with_rows=ALL_DOCS),
+        ChunkSummary(frozenset({("emb-9", "c1")}), 5, dim=8, documents_with_rows=ALL_DOCS),
+        ChunkSummary(frozenset({("emb-1", "c9")}), 5, dim=8, documents_with_rows=ALL_DOCS),
     ],
 )
 async def test_failed_verify_auto_rejects_and_blocks_later_steps(summary: ChunkSummary) -> None:
@@ -343,7 +350,10 @@ async def test_verify_row_count_vs_documents_is_unchecked() -> None:
     gate, _, _, _ = make()
     p = await gate.declare(draft(), declared_by="t")
     assert (
-        await gate.verify(p.policy_id, ChunkSummary(frozenset({("emb-1", "c1")}), 1))
+        await gate.verify(
+            p.policy_id,
+            ChunkSummary(frozenset({("emb-1", "c1")}), 1, dim=8, documents_with_rows=ALL_DOCS),
+        )
     ).status is S.VERIFIED
 
 

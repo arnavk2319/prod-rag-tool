@@ -32,9 +32,9 @@ class ChunkSummary:
 
     pairs: frozenset[tuple[str, str]]
     rows: int
-    dim: int | None = None  # embedding dimension of the written vectors; mismatch fails verify
-    # Optional: (tenant_id, doc_id) that have at least one written chunk.
-    documents_with_rows: frozenset[tuple[str, str]] | None = None
+    dim: int  # embedding dimension of the written vectors; mismatch fails verify (mandatory)
+    # (tenant_id, doc_id) that have at least one written chunk (mandatory)
+    documents_with_rows: frozenset[tuple[str, str]]
 
 
 class PolicyGate:
@@ -133,6 +133,8 @@ class PolicyGate:
 
     @staticmethod
     def _verify_problem(p: PipelinePolicy, s: ChunkSummary) -> str | None:
+        if not p.documents and s.rows == 0 and not s.pairs:
+            return None  # explicit zero expected documents (all deleted): an empty version is valid
         if s.rows <= 0:
             return "no chunks were written"
         if len(s.pairs) != 1:
@@ -142,12 +144,11 @@ class PolicyGate:
             return "written embedding model differs from the declared embedder"
         if chunker != p.chunker_version:
             return "written chunker version differs from the declared chunker"
-        if s.dim is not None and s.dim != p.embedder_dim:
+        if s.dim != p.embedder_dim:
             return "written embedding dimension differs from the declared dimension"
-        if s.documents_with_rows is not None:
-            declared = {(d.tenant_id, d.doc_id) for d in p.documents}
-            if declared - s.documents_with_rows:
-                return "declared documents have no written chunks"
+        declared = {(d.tenant_id, d.doc_id) for d in p.documents}
+        if declared - s.documents_with_rows:
+            return "declared documents have no written chunks"
         return None
 
     async def mark_indexed(self, policy_id: str) -> PipelinePolicy:

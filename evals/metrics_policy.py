@@ -68,7 +68,7 @@ async def _scenario(inject_violation: bool) -> int:
     gate = PolicyGate(
         repo, FakeAuditLog(), FakeClock(), FakeRegistryMirror(), FakeEvalRuns({"eval-ok"})
     )
-    ok = ChunkSummary(frozenset({("hash-64-v1", "c1")}), 3)
+    ok = ChunkSummary(frozenset({("hash-64-v1", "c1")}), 3, dim=64, documents_with_rows=frozenset())
     for version, kind in (("v1", ChangeKind.EMBEDDER), ("v2", ChangeKind.CORPUS_ONLY)):
         p = await gate.declare(_draft(version, kind), declared_by="harness")
         await gate.verify(p.policy_id, ok)

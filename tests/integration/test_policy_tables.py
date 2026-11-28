@@ -34,6 +34,9 @@ from rag_platform.domain.policy import (
 )
 from rag_platform.domain.ports import AuditEvent
 
+ALL_DOCS = frozenset({("a", "d1"), ("b", "d2")})
+
+
 pytestmark = pytest.mark.integration
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -745,7 +748,10 @@ async def test_gate_flow_succeeds_with_mlflow_down(dsn: str) -> None:
     p = make_policy(kind=ChangeKind.EMBEDDER)
     draft = PolicyDraft(**{k: getattr(p, k) for k in PolicyDraft.model_fields})
     declared = await gate.declare(draft, declared_by="op")
-    await gate.verify(declared.policy_id, ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=8))
+    await gate.verify(
+        declared.policy_id,
+        ChunkSummary(frozenset({("emb-1", "c1")}), 5, dim=8, documents_with_rows=ALL_DOCS),
+    )
     await gate.mark_indexed(declared.policy_id)
     done = await gate.mark_committed(declared.policy_id, eval_run_id="ev")
     assert done.status is S.COMMITTED
