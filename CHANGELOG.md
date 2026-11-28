@@ -37,5 +37,6 @@ Changes are tracked in pull requests (numbers below).
 - #23 Suppress a semgrep false positive on role switching
 
 ### Documentation
+- GPL-3.0-or-later license added
 - #16 Public status document and generator
 - #24 Skip the git-history status test on shallow clones

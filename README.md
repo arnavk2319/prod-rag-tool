@@ -152,4 +152,5 @@ Every change is a separate pull request into `dev`, with a conventional commit t
 
 ## License
 
-License: to be decided before release.
+Licensed under the GNU General Public License, version 3 or (at your option) any later version
+(GPL-3.0-or-later). See [LICENSE](LICENSE).

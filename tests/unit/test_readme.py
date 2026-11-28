@@ -58,4 +58,5 @@ def test_readme_states_foundation_status() -> None:
     text = _text("README.md")
     assert "Status: v0.1 Foundation" in text
     assert "docs/status.md" in text
-    assert "License: to be decided before release" in text
+    assert "GPL-3.0-or-later" in text and "[LICENSE](LICENSE)" in text
+    assert "LICENSE" in _tracked()
