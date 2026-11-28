@@ -186,6 +186,7 @@ class Versions(BaseModel):
     index_version: str
     embedding_model: str
     prompt_version: str
+    policy_hash: str | None = None
 
 
 class Message(BaseModel):

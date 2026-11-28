@@ -1510,6 +1510,17 @@
             "title": "Index Version",
             "type": "string"
           },
+          "policy_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Hash"
+          },
           "prompt_version": {
             "title": "Prompt Version",
             "type": "string"
