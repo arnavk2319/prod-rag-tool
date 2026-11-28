@@ -137,6 +137,9 @@ class SqlPolicyRepository:
             self._dsn, row_factory=dict_row
         ) as conn:  # commits on success, rolls back on any exception
             if self._role:
+                # The role is a constructor argument composed with psycopg sql.Identifier (quoted
+                # as an identifier), never request input.
+                # nosemgrep
                 await conn.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(self._role)))
             yield conn
 
