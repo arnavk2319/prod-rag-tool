@@ -10,6 +10,7 @@ import uuid
 from collections import defaultdict
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from datetime import datetime
 from typing import Any, LiteralString
 
@@ -121,6 +122,13 @@ _PREVIOUS: LiteralString = (
 ).replace("__COLS__", _COLS)
 
 
+# Connection a caller (the index-version commit) lends to this repository for one block, so a
+# policy transition lands in the caller's transaction. The caller commits or rolls back.
+_BOUND: ContextVar[psycopg.AsyncConnection[dict[str, Any]] | None] = ContextVar(
+    "policy_bound_conn", default=None
+)
+
+
 def _is_uuid(value: str) -> bool:
     try:
         uuid.UUID(value)
@@ -137,7 +145,20 @@ class SqlPolicyRepository:
         self._role = role
 
     @asynccontextmanager
+    async def bind(self, conn: psycopg.AsyncConnection[dict[str, Any]]) -> AsyncIterator[None]:
+        """Run every repository call inside the block on `conn` (no commit here)."""
+        token = _BOUND.set(conn)
+        try:
+            yield
+        finally:
+            _BOUND.reset(token)
+
+    @asynccontextmanager
     async def _tx(self) -> AsyncIterator[psycopg.AsyncConnection[dict[str, Any]]]:
+        bound = _BOUND.get()
+        if bound is not None:
+            yield bound
+            return
         async with await psycopg.AsyncConnection.connect(
             self._dsn, row_factory=dict_row
         ) as conn:  # commits on success, rolls back on any exception

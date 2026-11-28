@@ -155,7 +155,12 @@ class PolicyGate:
         return await self._move(policy_id, PolicyStatus.INDEXED)
 
     async def mark_committed(
-        self, policy_id: str, *, eval_run_id: str | None = None, actor: str = "commit-gate"
+        self,
+        policy_id: str,
+        *,
+        eval_run_id: str | None = None,
+        actor: str = "commit-gate",
+        sync: bool = True,
     ) -> PipelinePolicy:
         p = await self._get(policy_id)
         if p.status is not PolicyStatus.INDEXED:
@@ -169,15 +174,23 @@ class PolicyGate:
         done = await self._move(
             policy_id, PolicyStatus.COMMITTED, eval_run_id=run, action="policy.commit", actor=actor
         )
-        await sync_one(self._repo, self._mirror, done)
+        if sync:
+            await sync_one(self._repo, self._mirror, done)
         return done
 
-    async def mark_rolled_back(self, policy_id: str, *, actor: str = "operator") -> PipelinePolicy:
+    async def mark_rolled_back(
+        self, policy_id: str, *, actor: str = "operator", sync: bool = True
+    ) -> PipelinePolicy:
         done = await self._move(
             policy_id, PolicyStatus.ROLLED_BACK, action="policy.rollback", actor=actor
         )
-        await sync_one(self._repo, self._mirror, done)
+        if sync:
+            await sync_one(self._repo, self._mirror, done)
         return done
+
+    async def resync(self, p: PipelinePolicy) -> bool:
+        """Mirror a policy after the caller's transaction committed (sync=False callers)."""
+        return await sync_one(self._repo, self._mirror, p)
 
     async def reject(
         self, policy_id: str, reason: RejectReason, *, actor: str = "operator"
