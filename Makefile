@@ -1,4 +1,4 @@
-.PHONY: eval lint test typecheck verify contract-update up up-obs up-llm down clean urls doctor status
+.PHONY: eval lint test typecheck verify contract-update up migrate up-obs up-llm down clean urls doctor status
 
 lint:
 	uv run ruff check . && uv run ruff format --check .
@@ -21,6 +21,10 @@ contract-update:
 # --- local stack (Compose v2). Reads .env if present; ports and BIND_ADDR come from env.
 up:
 	PROVIDER=$${PROVIDER:-fake} docker compose up -d --build --wait
+
+# applies the schema as the owner role (local Postgres only); the app connects as rag_svc
+migrate:
+	@./scripts/migrate.sh
 
 up-obs:
 	PROVIDER=$${PROVIDER:-fake} docker compose --profile obs up -d --build --wait

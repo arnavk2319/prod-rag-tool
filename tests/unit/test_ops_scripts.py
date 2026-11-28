@@ -213,3 +213,57 @@ def test_build_context_and_image_hygiene() -> None:
     assert "--allowed-hosts=*" not in compose
     line = next(x for x in compose.splitlines() if x.strip().startswith("- --allowed-hosts="))
     assert "*" not in line and "mlflow:5000" in line
+
+
+MIGRATE = ROOT / "scripts" / "migrate.sh"
+
+
+def _migrate(env_extra: dict[str, str]) -> subprocess.CompletedProcess[str]:
+    env = {
+        k: v
+        for k, v in os.environ.items()
+        if k not in {"BIND_ADDR", "POSTGRES_PORT", "RAG_OWNER_PASSWORD"}
+    }
+    env.update({"MIGRATE_DRY_RUN": "1", "ENV_FILE": "/nonexistent"})
+    env.update(env_extra)
+    return subprocess.run(
+        ["bash", str(MIGRATE)], capture_output=True, text=True, env=env, check=False
+    )
+
+
+def test_migrate_syntax_and_no_destructive_commands() -> None:
+    assert subprocess.run(["bash", "-n", str(MIGRATE)], check=False).returncode == 0
+    text = MIGRATE.read_text(encoding="utf-8")
+    assert "set -eu" in text
+    assert "rag_owner" in text
+    assert "rag_svc" not in text.replace("rag_svc;", "").replace("as rag_svc", "")
+    for bad in ("DROP", "downgrade", "rm -", "TRUNCATE", "--volumes"):
+        assert bad not in text
+    assert "uv run alembic upgrade head" in text
+    assert "./scripts/migrate.sh" in (ROOT / "Makefile").read_text()
+
+
+@pytest.mark.parametrize("addr", ["10.0.0.5", "db.example.com", "192.168.1.2"])
+def test_migrate_refuses_non_local_host(addr: str) -> None:
+    r = _migrate({"BIND_ADDR": addr})
+    assert r.returncode != 0
+    assert "refusing non-local" in r.stderr
+
+
+def test_migrate_target_uses_owner_without_printing_password() -> None:
+    r = _migrate({"POSTGRES_PORT": "5544", "RAG_OWNER_PASSWORD": "s3cret-pw"})
+    assert r.returncode == 0
+    assert "rag_owner" in r.stdout
+    assert "127.0.0.1:5544/ragapp" in r.stdout
+    assert "s3cret-pw" not in r.stdout + r.stderr
+    d = _migrate({})
+    assert "dev-only-owner-password" not in d.stdout + d.stderr
+    assert "127.0.0.1:5432/ragapp" in d.stdout
+    assert _migrate({"BIND_ADDR": "0.0.0.0"}).returncode == 0
+    assert _migrate({"BIND_ADDR": "localhost"}).returncode == 0
+
+
+def test_urls_labels_api_only() -> None:
+    text = (ROOT / "scripts" / "urls.sh").read_text(encoding="utf-8")
+    assert "Web UI" not in text
+    assert 'row "API"' in text
