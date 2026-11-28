@@ -45,7 +45,7 @@
     "policy_violations": 0
   },
   "header": "mechanism proof, not model quality (provider: fake-extractive)",
-  "inputs_hash": "eabf4c44adac6aa286be57446c5c5c6f5fd4c111fba42ed5282c3b34a0f8e61a",
+  "inputs_hash": "46139160741d5d304c5be9011e3cb32dbf698352ad10cdffcd3239f1e3df3c3a",
   "metrics": {
     "chunk_determinism": 1.0,
     "injection_block_rate": 1.0,

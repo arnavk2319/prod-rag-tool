@@ -17,8 +17,10 @@ query, guardrails with explicit refusals, and evals that gate every change.
 
 - **Compose stack** (`compose.yaml`): `api`, a placeholder `worker`, Postgres 16 with pgvector 0.8, Redis and
   MLflow; optional Prometheus and Grafana (`obs` profile) and Ollama (`llm` profile).
-- **Versioned schema** (Alembic): row-level security on tenant data, separate database roles, and `chunks`
-  list-partitioned by index version. The tables exist; nothing populates them yet.
+- **Versioned schema** (Alembic): row-level security on every tenant table (a catalogue test fails if a
+  tenant table lacks it), separate database roles, `chunks` and `parent_chunks` list-partitioned by index
+  version, and a hash-chained append-only audit log written only through a security-definer function.
+  The tables exist; nothing populates them yet.
 - **Parent-child chunking** (`pc-300-1200-v1`): about 300-token children are embedded, about 1200-token
   parents are returned. See [ADR-0005](docs/decisions/ADR-0005-parent-child-chunking.md).
 - **Parsers, PII redaction and quarantine** for text, Markdown, HTML and PDF (no OCR). Structured PII is
@@ -26,8 +28,9 @@ query, guardrails with explicit refusals, and evals that gate every change.
   See [docs/ingest-safety.md](docs/ingest-safety.md).
 - **Embedder and reranker adapters:** `BAAI/bge-small-en-v1.5` via fastembed (384 dims), a deterministic hash
   embedder for tests, and a cross-encoder reranker adapter (not used by any retrieval path yet).
-- **Pipeline policy gate:** core logic against in-memory fakes ([ADR-0006](docs/decisions/ADR-0006-pipeline-policy-gate.md));
-  SQL tables and ingest wiring are not built.
+- **Pipeline policy gate** ([ADR-0006](docs/decisions/ADR-0006-pipeline-policy-gate.md)): policy model, state
+  machine, gate rules, MLflow mirror with outbox, SQL tables and repository are built and tested; wiring into
+  an ingest worker is not (that worker does not exist yet).
 - **OpenAPI v1 contract** with an error envelope, fixtures and snapshot test. Routes are stubs that return
   `501`. See [docs/api-contract.md](docs/api-contract.md) and
   [ADR-0004](docs/decisions/ADR-0004-api-contract-and-versioning.md).

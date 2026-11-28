@@ -28,6 +28,14 @@ Changes are tracked in pull requests (numbers below).
 - #14 Parsing, PII redaction and quarantine
 - #17 Pipeline policy gate (core logic)
 - #18 Parent-child chunking
+- #21 Pipeline policy gate: SQL tables, repository and hash-chained audit function
+
+### Security
+- #19 Refuse default secrets when the environment is production
+- #20 Explicit MLflow allowed hosts instead of a wildcard
+- #22 Row-level security on every tenant table and a hardened audit append
+- #23 Suppress a semgrep false positive on role switching
 
 ### Documentation
 - #16 Public status document and generator
+- #24 Skip the git-history status test on shallow clones

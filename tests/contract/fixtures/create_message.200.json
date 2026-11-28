@@ -22,6 +22,7 @@
   "versions": {
     "embedding_model": "embed-small-v1",
     "index_version": "idx_3",
+    "policy_hash": "3f1c0a9d5b7e2c4a8d6f1b3e5a7c9d0e2f4a6b8c0d1e3f5a7b9c1d3e5f7a9b0c",
     "prompt_version": "answer-v1"
   }
 }

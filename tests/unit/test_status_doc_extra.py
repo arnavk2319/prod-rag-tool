@@ -114,6 +114,10 @@ def test_no_merged_row_with_in_progress_ticket() -> None:
 
 
 def test_pr_numbers_exist_in_git_history() -> None:
+    # CI checks out a shallow clone: merge history is not available there, so this check can only
+    # run on a full clone (local runs and release checks).
+    if _git("rev-parse", "--is-shallow-repository").strip() == "true":
+        pytest.skip("needs full git history (shallow clone)")
     log = _git("log", "--all", "--merges", "--format=%s")
     merged = {int(n) for n in re.findall(r"pull request #(\d+)", log)}
     merged |= {int(n) for n in re.findall(r"\(#(\d+)\)", _git("log", "--all", "--format=%s"))}
