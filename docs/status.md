@@ -56,8 +56,8 @@ available; otherwise the block is left as committed.
 | T-007 | Synthetic corpus and ingest fixtures | P2 | merged | T-001 | [#11](https://github.com/arnavk2319/prod-rag-tool/pull/11) |
 | T-008 | Parse, PII redaction, quarantine | P2 | merged | T-002, T-007 | [#14](https://github.com/arnavk2319/prod-rag-tool/pull/14) |
 | T-009 | Chunker and embedder adapters | P2 | merged | T-002 | [#13](https://github.com/arnavk2319/prod-rag-tool/pull/13) |
-| T-010 | Ingest pipeline: raw_objects store, worker, idempotency, copy-forward staging, delete and re-index | P2 | in progress | T-003, T-008, T-009, T-044, T-045, T-047 | - |
-| T-011 | Index version gate, atomic alias swap, rollback, retention | P2 | planned | T-010, T-045 | - |
+| T-010 | Ingest pipeline: raw_objects store, worker, idempotency, copy-forward staging, delete and re-index | P2 | merged | T-003, T-008, T-009, T-044, T-045, T-047 | [#31](https://github.com/arnavk2319/prod-rag-tool/pull/31) |
+| T-011 | Index version gate, atomic alias swap, rollback, retention | P2 | in progress | T-010, T-045 | - |
 | T-012 | Hybrid retrieval (one SQL round trip) | P2 | planned | T-009, T-011, T-044 | - |
 | T-013 | Tenant, ACL and RLS leak tests with hard-zero metrics | P2 | planned | T-012, T-044 | - |
 | T-014 | Retrieval and ingest evals, smoke.yaml proposed, thresholds proposed | P2 | planned | T-005, T-012, T-013 | - |
