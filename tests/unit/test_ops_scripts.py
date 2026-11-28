@@ -210,3 +210,6 @@ def test_build_context_and_image_hygiene() -> None:
     assert (ROOT / "config/.gitkeep").exists() and (ROOT / "prompts/.gitkeep").exists()
     compose = (ROOT / "compose.yaml").read_text()
     assert "--allowed-hosts" in compose
+    assert "--allowed-hosts=*" not in compose
+    line = next(x for x in compose.splitlines() if x.strip().startswith("- --allowed-hosts="))
+    assert "*" not in line and "mlflow:5000" in line
