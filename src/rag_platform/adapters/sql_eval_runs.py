@@ -36,6 +36,9 @@ class SqlEvalRuns:
     async def passed(self, eval_run_id: str) -> bool:
         async with await psycopg.AsyncConnection.connect(self._dsn, row_factory=dict_row) as conn:
             if self._role:
+                # The role is a constructor argument composed with psycopg sql.Identifier (quoted
+                # as an identifier), never request input.
+                # nosemgrep
                 await conn.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(self._role)))
             cur = await conn.execute(_SELECT, (eval_run_id,))
             row = await cur.fetchone()
