@@ -96,7 +96,7 @@ def test_closing_hash_sequence_only() -> None:
 
 
 def test_last_chunk_has_enough_new_tokens() -> None:
-    for extra in range(501, 560, 3):
+    for extra in range(351, 410, 3):
         text = " ".join(f"w{i}" for i in range(extra))
         cs = chunk_text("h", text)
         last = cs[-1]

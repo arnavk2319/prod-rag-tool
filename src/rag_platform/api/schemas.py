@@ -152,6 +152,7 @@ class DocumentPage(BaseModel):
 class Chunk(BaseModel):
     document_id: str
     chunk_id: str
+    parent_id: str | None = None
     document_title: str
     text: str
     heading_path: list[str]
@@ -177,6 +178,7 @@ class ActionResult(BaseModel):
 class Citation(BaseModel):
     document_id: str
     chunk_id: str
+    parent_id: str | None = None
     span: Span
 
 

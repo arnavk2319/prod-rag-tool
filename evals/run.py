@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from evals.lib import REPO_ROOT, inputs_hash, wilson_interval, write_report
-from evals.metrics_chunking import chunk_determinism
+from evals.metrics_chunking import chunk_determinism, orphan_children
 from evals.metrics_pii import evaluate as pii_evaluate
 from evals.metrics_policy import evaluate as policy_evaluate
 from evals.providers import SERVED_MODEL, ExtractiveFakeProvider, overlap, render_prompt
@@ -143,6 +143,7 @@ def build_report(
         "metrics": metrics,
         "hard_zero": {
             "cross_tenant_leakage": sum(int(r["leaked"]) for r in results.values()),
+            "orphan_children": orphan_children(root),
             **pii["hard_zero"],
             **policy_evaluate(),
         },

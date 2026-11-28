@@ -1,6 +1,6 @@
 """Reusable contract checks per port; real adapters import and run these too."""
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 from rag_platform.domain.ports import (
     AuditEvent,
@@ -11,6 +11,7 @@ from rag_platform.domain.ports import (
     IndexRepository,
     ModelProvider,
     ObjectStore,
+    ParentChunk,
     RateLimiter,
     Registry,
     Reranker,
@@ -18,7 +19,9 @@ from rag_platform.domain.ports import (
 )
 
 
-def make_chunk(cid: str, tenant: str, labels: set[str], text: str = "t", doc: str = "d1") -> Chunk:
+def make_chunk(
+    cid: str, tenant: str, labels: set[str], text: str = "t", doc: str = "d1", parent: str = "p1"
+) -> Chunk:
     return Chunk(
         chunk_id=cid,
         doc_id=doc,
@@ -29,6 +32,23 @@ def make_chunk(cid: str, tenant: str, labels: set[str], text: str = "t", doc: st
         index_version="v1",
         embedding_model="m",
         chunker_version="c1",
+        parent_id=parent,
+    )
+
+
+def make_parent(pid: str, tenant: str, labels: set[str], doc: str = "d1") -> ParentChunk:
+    return ParentChunk(
+        parent_id=pid,
+        doc_id=doc,
+        tenant_id=tenant,
+        text="parent text",
+        acl_labels=frozenset(labels),
+        index_version="v1",
+        chunker_version="c1",
+        ordinal=0,
+        token_count=2,
+        doc_hash="h",
+        effective_date=date(2026, 1, 1),
     )
 
 
@@ -76,7 +96,22 @@ async def check_index(repo: IndexRepository) -> None:
         (1.0, 0.0), tenant_id="t1", user_labels=frozenset({"a"}), index_version="v2", k=10
     )
     assert none == []
+    await repo.add_parents([make_parent("p1", "t1", {"a"}), make_parent("p9", "t2", {"a"})])
+    await repo.add_parents([make_parent("p1", "t1", {"a"})])  # idempotent
+    got = await repo.get_parents(
+        tenant_id="t1", index_version="v1", parent_ids=["p1", "p9", "nope"]
+    )
+    assert list(got) == ["p1"]  # a forged id of another tenant (p9) or unknown id: nothing
+    assert got["p1"].tenant_id == "t1"
+    assert (
+        await repo.get_parents(tenant_id="t1", index_version="v2", parent_ids=["p1"])
+    ) == {}  # parents are keyed by index version too
     assert await repo.delete_document("t1", "d1") == 3
+    assert (
+        await repo.get_parents(tenant_id="t1", index_version="v1", parent_ids=["p1"])
+    ) == {}  # delete removes parents with their children
+    other = await repo.get_parents(tenant_id="t2", index_version="v1", parent_ids=["p9"])
+    assert list(other) == ["p9"]
     assert await repo.delete_document("t1", "d1") == 0
 
 

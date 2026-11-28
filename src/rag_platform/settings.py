@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     cache_ttl_s: int = Field(default=300, ge=0)
     rate_limit_user_rpm: int = Field(default=30, ge=1)
     rate_limit_tenant_rpm: int = Field(default=300, ge=1)
-    context_token_budget: int = Field(default=3000, ge=1)
+    context_token_budget: int = Field(default=4000, ge=1)
     rerank_min_score: float = 0.0
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     public_base_url: str = "http://localhost:8000"

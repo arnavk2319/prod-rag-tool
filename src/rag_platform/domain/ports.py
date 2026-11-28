@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Protocol
 
 
@@ -17,13 +17,55 @@ class Chunk:
     index_version: str
     embedding_model: str
     chunker_version: str
+    parent_id: str
     span: tuple[int, int] = (0, 0)
+
+
+@dataclass(frozen=True)
+class ParentChunk:
+    """The passage a child belongs to. Returned to the generator; never embedded or searched."""
+
+    parent_id: str
+    doc_id: str
+    tenant_id: str
+    text: str
+    acl_labels: frozenset[str]
+    index_version: str
+    chunker_version: str
+    ordinal: int
+    token_count: int
+    doc_hash: str
+    effective_date: date
+    doc_version: int = 1
+    heading_path: tuple[str, ...] = ()
+    span: tuple[int, int] = (0, 0)
+    expires_date: date | None = None
 
 
 @dataclass(frozen=True)
 class ScoredChunk:
     chunk: Chunk
     score: float
+
+
+@dataclass(frozen=True)
+class ChildMatch:
+    chunk_id: str
+    score: float
+    span: tuple[int, int]
+
+
+@dataclass(frozen=True)
+class RetrievedPassage:
+    """Retrieval result: a parent's text plus the child chunks that matched inside it."""
+
+    parent_id: str
+    doc_id: str
+    text: str
+    token_count: int
+    score: float  # best matching child
+    children: tuple[ChildMatch, ...]
+    truncated: bool = False
 
 
 @dataclass(frozen=True)
@@ -66,6 +108,10 @@ class Reranker(Protocol):
 
 class IndexRepository(Protocol):
     async def add_chunks(self, chunks: Sequence[Chunk]) -> int: ...
+    async def add_parents(self, parents: Sequence[ParentChunk]) -> int: ...
+    async def get_parents(
+        self, *, tenant_id: str, index_version: str, parent_ids: Sequence[str]
+    ) -> dict[str, ParentChunk]: ...
     async def search(
         self,
         embedding: Sequence[float],

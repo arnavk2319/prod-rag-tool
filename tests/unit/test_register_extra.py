@@ -103,13 +103,13 @@ def test_content_hash_is_sha256_hex() -> None:
 
 
 def test_metric_detects_nondeterminism(monkeypatch: pytest.MonkeyPatch) -> None:
-    real = mc.chunk_text
+    real = mc.chunk_document
     counter = itertools.count()
 
     def flaky(doc_hash: str, text: str):
         return real(doc_hash + str(next(counter)), text)
 
-    monkeypatch.setattr(mc, "chunk_text", flaky)
+    monkeypatch.setattr(mc, "chunk_document", flaky)
     assert mc.chunk_determinism(ROOT) == 0.0
 
 

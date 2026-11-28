@@ -330,6 +330,17 @@
             ],
             "title": "Page"
           },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
           "span": {
             "$ref": "#/components/schemas/Span"
           },
@@ -359,6 +370,17 @@
           "document_id": {
             "title": "Document Id",
             "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
           },
           "span": {
             "$ref": "#/components/schemas/Span"

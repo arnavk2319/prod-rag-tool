@@ -170,7 +170,11 @@ def test_check_names_stale_block_and_exit_codes(tmp_path: Path) -> None:
     root = _clone(tmp_path)
     doc = root / "docs/status.md"
     assert _run(root, "--check").returncode == 0
-    doc.write_text(doc.read_text().replace("`0001`", "`0002`", 1))
+    # Tamper with whatever migration revision the generated block currently states, so the test
+    # does not depend on which revision is head.
+    stale = re.sub(r"`(\d{4})`", "`9999`", doc.read_text(), count=1)
+    assert stale != doc.read_text()
+    doc.write_text(stale)
     r = _run(root, "--check")
     assert r.returncode == 1 and "built" in r.stderr
     assert _run(root).returncode == 2

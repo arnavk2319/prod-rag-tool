@@ -21,11 +21,11 @@ the Choice column states what is not yet built.
 | Parser | Text, Markdown, HTML and PDF extraction with limits. No OCR | merged | T-008 | #14 | 1, 13 |
 | Redaction | Structured PII (emails, phones, ids, cards and similar) redacted before indexing; person names are out of scope and listed as a gap | merged | T-008 | #14 | 1, 13 |
 | Quarantine | Unparseable, scanned, oversize or injection-flagged files are quarantined with a reason, never indexed | merged | T-008 | #14 | 1, 13 |
-| Chunker | Merged: single-level `chunker-v1`, 300-500 tokens. Being replaced by parent-child chunking (children 300 tokens embedded, parents 1200 tokens returned) | in progress | T-009, T-044 | #13 | 19 |
+| Chunker | Parent-child chunking `pc-300-1200-v1`: parents of about 1200 tokens (no overlap, tile the document) are returned; children of about 300 tokens (12% overlap inside one parent, never crossing a parent) are embedded and searched; heading path kept; sizes are settings. Tables can still be split across chunks. The earlier single-level chunker (#13) is replaced | in review | T-009, T-044 | #13, #18 | 19 |
 | Embedder | `BAAI/bge-small-en-v1.5` via fastembed (384 dims) and a deterministic hash embedder for tests and gates | merged | T-009 | #13 | 2, 7 |
 | Reranker | Cross-encoder adapter merged; not used by any retrieval path yet | merged | T-009 | #13 | 2, 7 |
-| Policy gate | Per-index-version policy row declared before embedding and verified after; Postgres authoritative, MLflow mirror best effort. Not built | in progress | T-045 | - | 20 |
-| Index versions | Schema only (list-partitioned `chunks`, `index_versions`, `index_alias`). No build, gate, alias swap or rollback code yet | planned | T-003, T-011 | #7 | 5 |
+| Policy gate | Core logic merged (#17) against in-memory fakes: policy model and hash, state machine, gate rules, MLflow mirror with outbox, `policy_violations` check. Not built yet: SQL tables, ingest wiring, API field. Postgres authoritative, MLflow mirror best effort | in progress | T-045 | #17 | 20 |
+| Index versions | Schema only (list-partitioned `chunks` and, in review, `parent_chunks`; `index_versions`, `index_alias`). No build, gate, alias swap or rollback code yet | planned | T-003, T-011 | #7 | 5 |
 | Vector store | Postgres 16 with pgvector 0.8 (per-partition HNSW index DDL exists; nothing is populated or queried yet) | merged | T-003, T-004 | #7, #8 | 3, 6 |
 | Retrieval | Hybrid vector plus full-text in one SQL round trip with tenant and ACL filters inside the query. Not built | planned | T-012, T-013 | - | 4, 6 |
 | Generation chain | Ollama-first ordered fallback, last tier deterministic extractive, no paid models. No wrapper, no config file, no prompts in use yet | planned | T-016, T-019 | - | 7, 8 |
@@ -90,9 +90,9 @@ available; otherwise the block is left as committed.
 | T-041 | HUMAN: Gate B and D, release tag | P6 | planned | T-040 | - |
 | T-042 | Web foundation: Vite/React/TS/Tailwind scaffold, Console tokens, static Console prototype, shell, generated client, MSW mocks | P4 | planned | T-001, T-043 | - |
 | T-043 | OpenAPI contract v1: every endpoint, error model, fixtures, snapshot and contract test | P1 | merged | T-001, T-002 | [#9](https://github.com/arnavk2319/prod-rag-tool/pull/9) |
-| T-044 | Parent-child chunking: children 300 tokens embedded, parents 1200 tokens returned | P2 | in progress | T-003, T-009 | - |
-| T-045 | Pipeline policy gate: declare, verify, record in Postgres, mirror to MLflow | P2 | in progress | T-003, T-009 | - |
-| T-046 | Public status document and generator: what is planned, built and decided | P2 | in progress | T-001 | - |
+| T-044 | Parent-child chunking: children 300 tokens embedded, parents 1200 tokens returned | P2 | in review | T-003, T-009 | [#18](https://github.com/arnavk2319/prod-rag-tool/pull/18) |
+| T-045 | Pipeline policy gate: declare, verify, record in Postgres, mirror to MLflow | P2 | merged | T-003, T-009 | [#17](https://github.com/arnavk2319/prod-rag-tool/pull/17) |
+| T-046 | Public status document and generator: what is planned, built and decided | P2 | merged | T-001 | [#16](https://github.com/arnavk2319/prod-rag-tool/pull/16) |
 <!-- generated:tickets end -->
 
 ## 3. Currently built
@@ -104,16 +104,16 @@ Generated from code and config, so it cannot drift from the repository.
 
 | Item | Value |
 | --- | --- |
-| Chunking strategy | single-level `chunker-v1`: 300-500 tokens (target 400), overlap ratio 0.12 |
+| Chunking strategy | single-level `None`: None-None tokens (target None), overlap ratio 0.12 |
 | Embedding model | `BAAI/bge-small-en-v1.5`, 384 dims; backend default `hash` (`hash` = deterministic test embedder) |
 | Reranker | `Xenova/ms-marco-MiniLM-L-6-v2` adapter exists; not yet wired into any retrieval path |
 | Provider default | `fake` (no real model is called by default) |
 | LLM fallback chain | not built: `config/models.yaml` does not exist yet |
-| Pipeline policy gate | not built (no policy module in `src/`) |
+| Pipeline policy gate | code present |
 | Vector store and index | Postgres with pgvector (`pgvector/pgvector:0.8.0-pg16`); tables `index_versions`, `index_alias`, `chunks` exist in the schema; the per-partition HNSW index DDL exists, but no index is populated or queried yet |
 | Registry | `registry_pointers` table exists in the schema; nothing writes it yet |
 | Database roles | `rag_app`, `rag_owner`, `rag_svc` |
-| Highest migration revision | `0001` |
+| Highest migration revision | `0002` |
 
 **Settings defaults** (`src/rag_platform/settings.py`, secrets and credentialed URLs omitted)
 
@@ -129,7 +129,7 @@ Generated from code and config, so it cannot drift from the repository.
 | `cache_ttl_s` | `300` |
 | `rate_limit_user_rpm` | `30` |
 | `rate_limit_tenant_rpm` | `300` |
-| `context_token_budget` | `3000` |
+| `context_token_budget` | `4000` |
 | `rerank_min_score` | `0.0` |
 | `log_level` | `INFO` |
 | `public_base_url` | `http://localhost:8000` |
@@ -148,7 +148,7 @@ Generated from code and config, so it cannot drift from the repository.
 | prometheus | `prom/prometheus:v3.5.0` | 9090 (env PROMETHEUS_PORT) |
 | grafana | `grafana/grafana:12.2.0` | 3000 (env GRAFANA_PORT) |
 
-**Database tables** (all migrations): `documents`, `raw_objects`, `ingest_jobs`, `quarantine_items`, `index_versions`, `chunks`, `index_alias`, `chat_sessions`, `chat_messages`, `control_flags`, `registry_pointers`, `golden_sets`, `gate_runs`, `audit_log`, `role_labels`, `request_traces`
+**Database tables** (all migrations): `documents`, `raw_objects`, `ingest_jobs`, `quarantine_items`, `index_versions`, `chunks`, `index_alias`, `chat_sessions`, `chat_messages`, `control_flags`, `registry_pointers`, `golden_sets`, `gate_runs`, `audit_log`, `role_labels`, `request_traces`, `parent_chunks`
 
 **Pinned dependencies** (`pyproject.toml`)
 
@@ -163,6 +163,8 @@ Registered architecture decision records (ADRs) in `docs/decisions/`:
 | File | Title |
 | --- | --- |
 | `ADR-0004-api-contract-and-versioning.md` | ADR-0004: API contract and versioning |
+| `ADR-0005-parent-child-chunking.md` | ADR-0005: Parent-child chunking |
+| `ADR-0006-pipeline-policy-gate.md` | ADR-0006 Pipeline policy gate |
 <!-- generated:adrs end -->
 
 ## 4. Decisions
@@ -254,12 +256,12 @@ Each entry gives the choice and the reason. Entries marked planned are decided b
     records, this page and technical docs are committed; the author's planning and private working
     files stay on the author's machine and are never committed. Reason: the repository should show
     the system and its evidence, not the planning process.
-19. **Parent-child chunking (planned).** Children of about 300 tokens are embedded and searched; the
+19. **Parent-child chunking (in review).** Children of about 300 tokens are embedded and searched; the
     parent of about 1200 tokens is returned; only children are embedded; at most 3 parents are packed
     into a context budget of about 4000 tokens. Reason: small chunks match precisely while larger
     parents give the generator context, and children stay under the 512-wordpiece embedder limit. The
     cost is a larger prompt for small local models, so sizes and parent count are settings.
-20. **Pipeline policy gate (planned).** Every index version has a policy row (reason, change kind,
+20. **Pipeline policy gate (core merged, SQL and wiring pending).** Every index version has a policy row (reason, change kind,
     embedder, chunker, redaction, reranker, prompt and generator versions, documents touched, run and
     eval ids, hash) declared before embedding and verified after. Postgres is authoritative and the
     MLflow registry is a best-effort mirror through an outbox. Reason: every index change is deliberate
@@ -284,7 +286,7 @@ Suite `smoke`, served model `fake-extractive`. mechanism proof, not model qualit
 | pii_recall | 1.0 | none set | n/a |
 | recall_at_5 | 1.0 | >= 0.8 | pass |
 
-Hard-zero counters: cross_tenant_leakage = 0, pii_leak = 0.
+Hard-zero counters: cross_tenant_leakage = 0, orphan_children = 0, pii_leak = 0, policy_violations = 0.
 
 | Class | Cases | Passed |
 | --- | --- | --- |
