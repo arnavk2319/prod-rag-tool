@@ -51,12 +51,14 @@ Requires Docker (Compose v2). Python tooling uses [uv](https://docs.astral.sh/uv
 ```bash
 make doctor     # check Docker, free ports and config
 make up         # start the core stack (fake provider, no model calls)
+make migrate    # apply the database schema (as the owner role)
 make urls       # print the URL of every running service
 make up-obs     # add Prometheus and Grafana
 make down       # stop the stack
 make clean      # stop and remove volumes
 ```
 
+`make migrate` applies the schema as the owner role; the application connects as `rag_svc`.
 Ports and `BIND_ADDR` come from the shell or from a `.env` file; copy `.env.example` to start. On macOS,
 ports 5000 (AirPlay Receiver) and 11434 may already be taken. Set `MLFLOW_PORT` and `OLLAMA_PORT` in `.env`
 to free ports, then run `make doctor` again. Variables are described in [docs/running.md](docs/running.md).
